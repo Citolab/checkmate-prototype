@@ -63,37 +63,37 @@
       "confidence": 88
     }
   },
-  "answerGroups": [
+"answerGroups": [
     {
-      "title": "Correcte antwoorden",
-      "answers": [
-        { "id": 1, "text": "water", "aiScore": 2 },
-        { "id": 2, "text": "Water.", "aiScore": 2 }
-      ]
+        "title": "Correcte antwoorden",
+        "answers": [
+            { "id": 1, "text": "water", "aiScore": 2, "confidence": 98 },
+            { "id": 2, "text": "Water.", "aiScore": 2, "confidence": 97 }
+        ]
     },
     {
-      "title": "Groep met bossen en heggen",
-      "answers": [
-        { "id": 3, "text": "leeft vooral in de buurt van bossen en heggen", "aiScore": 0 },
-        { "id": 4, "text": "Hij leeft vooral in de buurt van bossen en heggen.", "aiScore": 0 },
-        { "id": 5, "text": "bossen en heggen", "aiScore": 0 },
-        { "id": 6, "text": "leven in buurt van bossen en heggen", "aiScore": 0 }
-      ]
+        "title": "Groep met bossen en heggen",
+        "answers": [
+            { "id": 3, "text": "leeft vooral in de buurt van bossen en heggen", "aiScore": 0, "confidence": 94 },
+            { "id": 4, "text": "Hij leeft vooral in de buurt van bossen en heggen.", "aiScore": 0, "confidence": 93 },
+            { "id": 5, "text": "bossen en heggen", "aiScore": 0, "confidence": 92 },
+            { "id": 6, "text": "leven in buurt van bossen en heggen", "aiScore": 0, "confidence": 91 }
+        ]
     },
     {
-      "title": "Overige antwoorden",
-      "answers": [
-        { "id": 7, "text": "nestgelegenheden", "aiScore": 0 },
-        { "id": 8, "text": "de temperatuur", "aiScore": 1 },
-        { "id": 9, "text": "andere dieren die de eitjes op eten", "aiScore": 0 },
-        { "id": 10, "text": "watervlooien", "aiScore": 0 },
-        { "id": 11, "text": "omgeving (bossen, heggen en water in de buurt)", "aiScore": 1 },
-        { "id": 12, "text": "bosgroei", "aiScore": 0 },
-        { "id": 13, "text": "de larven eten de watervlooien op.", "aiScore": 0 },
-        { "id": 14, "text": "water bossen en heggen", "aiScore": 1 },
-        { "id": 15, "text": "vele verschillende kleuren", "aiScore": 0 },
-        { "id": 16, "text": "de kamsalamander is zeer zeldzaam in Nederland.", "aiScore": 0 }
-      ]
+        "title": "Overige antwoorden",
+        "answers": [
+            { "id": 7, "text": "nestgelegenheden", "aiScore": 0, "confidence": 4 },
+            { "id": 8, "text": "de temperatuur", "aiScore": 1, "confidence": 82 },
+            { "id": 9, "text": "andere dieren die de eitjes op eten", "aiScore": 0, "confidence": 75 },
+            { "id": 10, "text": "watervlooien", "aiScore": 0, "confidence": 78 },
+            { "id": 11, "text": "omgeving (bossen, heggen en water in de buurt)", "aiScore": 1, "confidence": 85 },
+            { "id": 12, "text": "bosgroei", "aiScore": 0, "confidence": 4 },
+            { "id": 13, "text": "de larven eten de watervlooien op.", "aiScore": 0, "confidence": 76 },
+            { "id": 14, "text": "water bossen en heggen", "aiScore": 1, "confidence": 88 },
+            { "id": 15, "text": "vele verschillende kleuren", "aiScore": 0, "confidence": 8 },
+            { "id": 16, "text": "de kamsalamander is zeer zeldzaam in Nederland.", "aiScore": 0, "confidence": 74 }
+        ]
     }
-  ]
+]
 }

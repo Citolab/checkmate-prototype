@@ -10,7 +10,7 @@ const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanati
       style={{ zIndex: 9999 }}
     >
       <div className="flex justify-between items-start mb-3">
-        <h3 className="font-bold text-gray-800">AI-suggestie toelichting</h3>
+        <h3 className="font-bold text-gray-800">Toelichting</h3>
         <button
           onClick={() => setActivePopup(null)}
           className="text-gray-400 hover:text-gray-600"
@@ -20,10 +20,7 @@ const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanati
       </div>
 
       <div className="mb-4">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-sm font-medium text-gray-600">Antwoord:</span>
-          <span className="text-gray-800">"{highlightWaterWord(answer.text)}"</span>
-        </div>
+
 
         <div className="flex flex-col mb-3">
           <div className="flex items-center mb-2">
@@ -31,37 +28,22 @@ const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanati
             <span className="ml-2 w-6 h-6 bg-purple-100 border border-purple-300 rounded-full inline-flex items-center justify-center font-bold text-sm text-purple-800">
               {answer.aiScore}
             </span>
+
+            <span className="text-sm text-purple-600 ml-2">{getAIExplanation(answer.id)?.confidence || 0}% zeker</span>
           </div>
 
-          <div className="flex items-center">
-            <span className="text-sm font-medium text-gray-600 mr-2">Zekerheid:</span>
-            <div className="flex-grow">
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="h-2 rounded-full"
-                  style={{
-                    width: `${getAIExplanation(answer.id)?.confidence || 0}%`,
-                    backgroundColor: `rgba(147, 51, 234, ${(getAIExplanation(answer.id)?.confidence || 0) / 100})`
-                  }}
-                ></div>
-              </div>
-              <div className="text-xs text-right text-gray-600 mt-1">
-                {getAIExplanation(answer.id)?.confidence || 0}%
-              </div>
-            </div>
-          </div>
+          
         </div>
       </div>
 
       <div className="mb-4">
-        <h4 className="font-medium text-gray-700 mb-2">Vergelijkbare antwoorden uit database:</h4>
+        <h4 className="font-medium text-gray-700 mb-2 text-sm">Door scores van vergelijkbare antwoorden</h4>
         <div className="max-h-48 overflow-y-auto pr-2 mb-4">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
                 <th className="text-left py-2 px-2">Antwoord</th>
                 <th className="text-center py-2 w-16">Score</th>
-                <th className="text-right py-2 px-2 w-24">Datum</th>
               </tr>
             </thead>
             <tbody>
@@ -73,7 +55,6 @@ const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanati
                       {similar.score}
                     </span>
                   </td>
-                  <td className="py-2 px-2 text-right text-gray-600">{similar.date}</td>
                 </tr>
               ))}
             </tbody>
@@ -494,6 +475,7 @@ const ScoringSystem = () => {
                           </button>
 
                           {/* AI-score or vraagteken button */}
+                          {answer.confidence > 10 ? (
                           <button
                             onClick={() => togglePopup(answer.id)}
                             className={`ml-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors border bg-purple-100 text-purple-800 border-purple-300`}
@@ -503,6 +485,15 @@ const ScoringSystem = () => {
                               {answer.aiScore}
                             </span>
                           </button>
+                          ) : (
+                            <button
+                              // onClick={() => togglePopup(answer.id)}
+                              className={`ml-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors border bg-white text-gray-400 border-gray-300`}
+                              title="Geen AI-suggestie beschikbaar"
+                            >
+                              ?
+                            </button>
+                          )}
                         </div>
                       </div>
 
