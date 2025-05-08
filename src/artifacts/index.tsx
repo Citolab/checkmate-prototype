@@ -1,5 +1,95 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanation, highlightWaterWord }) => {
+  if (activePopup !== answer.id) return null;
+
+  return (
+    <div
+      className="fixed z-[9999] bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-96 right-24 mt-2 ai-suggestie-popup"
+      style={{ zIndex: 9999 }}
+    >
+      <div className="flex justify-between items-start mb-3">
+        <h3 className="font-bold text-gray-800">AI-suggestie toelichting</h3>
+        <button
+          onClick={() => setActivePopup(null)}
+          className="text-gray-400 hover:text-gray-600"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div className="mb-4">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-sm font-medium text-gray-600">Antwoord:</span>
+          <span className="text-gray-800">"{highlightWaterWord(answer.text)}"</span>
+        </div>
+
+        <div className="flex flex-col mb-3">
+          <div className="flex items-center mb-2">
+            <span className="text-sm font-medium text-gray-600">Voorgestelde score:</span>
+            <span className="ml-2 w-6 h-6 bg-purple-100 border border-purple-300 rounded-full inline-flex items-center justify-center font-bold text-sm text-purple-800">
+              {answer.aiScore}
+            </span>
+          </div>
+
+          <div className="flex items-center">
+            <span className="text-sm font-medium text-gray-600 mr-2">Zekerheid:</span>
+            <div className="flex-grow">
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="h-2 rounded-full"
+                  style={{
+                    width: `${getAIExplanation(answer.id)?.confidence || 0}%`,
+                    backgroundColor: `rgba(147, 51, 234, ${(getAIExplanation(answer.id)?.confidence || 0) / 100})`
+                  }}
+                ></div>
+              </div>
+              <div className="text-xs text-right text-gray-600 mt-1">
+                {getAIExplanation(answer.id)?.confidence || 0}%
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <h4 className="font-medium text-gray-700 mb-2">Vergelijkbare antwoorden uit database:</h4>
+        <div className="max-h-48 overflow-y-auto pr-2 mb-4">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left py-2 px-2">Antwoord</th>
+                <th className="text-center py-2 w-16">Score</th>
+                <th className="text-right py-2 px-2 w-24">Datum</th>
+              </tr>
+            </thead>
+            <tbody>
+              {getAIExplanation(answer.id)?.similarAnswers.map((similar, idx) => (
+                <tr key={idx} className="border-t border-gray-100">
+                  <td className="py-2 px-2 text-gray-800">{highlightWaterWord(similar.text)}</td>
+                  <td className="py-2 text-center">
+                    <span className="w-6 h-6 bg-gray-100 border rounded-full inline-flex items-center justify-center text-xs font-medium text-gray-800">
+                      {similar.score}
+                    </span>
+                  </td>
+                  <td className="py-2 px-2 text-right text-gray-600">{similar.date}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <h4 className="font-medium text-gray-700 mb-2">AI feedback:</h4>
+          <div className="text-sm text-gray-700 bg-purple-50 p-3 rounded-md border border-purple-100">
+            {getAIExplanation(answer.id)?.explanation}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ScoringSystem = () => {
   // States voor de applicatie
   const [scores, setScores] = useState({});
@@ -292,29 +382,22 @@ const ScoringSystem = () => {
     return group.answers.filter(answer => !scores.hasOwnProperty(answer.id) || animatingItems[answer.id]);
   };
 
-  return (
-    <div className="flex bg-gray-50 p-6 rounded-lg h-dvh mx-auto">
-      {/* Linker kolom - Vraag */}
-      <div className="w-1/4 mr-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">{question.title}</h2>
-          <p className="text-gray-700 mb-4">{question.text}</p>
-          <div className="bg-gray-100 p-4 rounded-lg border-l-4 border-blue-500">
-            <h3 className="font-semibold text-gray-800">{question.instruction}</h3>
-          </div>
-          <div className="mt-4">
-            <img
-              src="/api/placeholder/260/180"
-              alt="Afbeelding van een kamsalamander"
-              className="rounded-lg mx-auto"
-            />
-          </div>
-        </div>
-      </div>
+  const handleGroupScoreChange = (groupIndex, score) => {
+    const group = answerGroups[groupIndex];
+    const newScores = { ...scores };
 
-      {/* Rechter kolom - Antwoordmodel en antwoorden */}
-      <div ref={rightColumnRef} className="flex-1 flex flex-col">
-        {/* Voortgangsbalk in grijze gebied */}
+    group.answers.forEach(answer => {
+      newScores[answer.id] = score;
+    });
+
+    setScores(newScores);
+  };
+
+  return (
+    <div className="flex bg-gray-200 overflow-hidden p-6 rounded-sm h-dvh">
+      {/* Linker kolom - Vraag */}
+      <div className="w-1/3 mr-6">
+
         <div className="bg-gray-100 p-4 rounded-lg shadow-sm mb-4">
           <div className="flex justify-between items-center mb-2">
             <div className="text-sm font-medium text-gray-700">Voortgang beoordeling</div>
@@ -332,19 +415,66 @@ const ScoringSystem = () => {
 
         {/* Antwoordmodel los bovenin */}
         <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-gray-700 font-semibold">Antwoordmodel</h3>
-            <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-500 text-white rounded-full text-xs font-bold">✓</span>
-          </div>
-          <p className="text-lg font-bold text-gray-800 mt-2">{question.correctAnswer}</p>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-500 text-white rounded-full text-xs font-bold">✓</span>
+              <h3 className="text-gray-700 font-semibold">Antwoordmodel</h3>
+            </div>
+          <span className="text-lg font-bold text-gray-800 mt-2 bg-purple-200 px-1 rounded">{question.correctAnswer}</span>
         </div>
 
-        {/* Toggles direct boven leerlingantwoorden */}
-        <div className="flex justify-end items-center mb-3 gap-6">
 
-          {/* Add a button to apply all AI-suggested scores */}
-          {showAISuggestions && (
-            <div className="flex justify-end mb-4">
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">{question.title}</h2>
+          <p className="text-gray-700 mb-4">{question.text}</p>
+          <div className="bg-gray-100 p-4 rounded-lg border-l-4 border-blue-500">
+            <h3 className="font-semibold text-gray-800">{question.instruction}</h3>
+          </div>
+          <div className="mt-4">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Kammmolchmaennchen.jpg"
+              alt="Afbeelding van een kamsalamander"
+              className="rounded-lg mx-auto"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Rechter kolom - Antwoordmodel en antwoorden */}
+      <div ref={rightColumnRef} className="flex-1 flex flex-col h-full overflow-auto">
+        {/* Voortgangsbalk in grijze gebied */}
+
+
+
+
+
+
+
+
+        {/* Scrollbare antwoorden container */}
+        <div className="pr-1">
+          {/* Antwoordentabel zonder blauwe header */}
+          <div className="rounded-lg shadow-sm overflow-y-auto flex-grow relative">
+            {/* Kolomlabels */}
+            <div className="px-4 py-2 flex items-center justify-between">
+              {/* <div className="flex-grow font-medium text-gray-700">Antwoord</div> */}
+                {/* <div className="w-32 text-center font-medium text-gray-700 mr-2">Score</div> */}
+                {/* <div className="w-20 text-center font-medium text-gray-700">AI</div> */}
+                {/* Toggle voor het verbergen van gescoorde antwoorden */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">Verberg gescoorde</span>
+                  <button
+                    onClick={toggleHideScored}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${hideScored ? 'bg-blue-600' : 'bg-gray-300'}`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${hideScored ? 'translate-x-6' : 'translate-x-1'}`}
+                    />
+                  </button>
+                </div>
+
+
+            {/* Add a button to apply all AI-suggested scores */}
+            {showAISuggestions && (
               <button
                 onClick={() => {
                   const newScores = {};
@@ -357,58 +487,30 @@ const ScoringSystem = () => {
                   });
                   setScores(prevScores => ({ ...prevScores, ...newScores }));
                 }}
-                className="bg-purple-100 text-purple-800 border border-purple-300 px-2 py-1 rounded-lg text-sm "
+                className="bg-purple-100 text-purple-800 border border-purple-300 px-2 py-1 rounded-lg text-xs "
               >
                 Pas alle AI-suggesties toe
               </button>
+            )}
+            
+                {/* Toggle voor AI suggesties */}
+                <div className="flex items-center justify-end gap-2">
+                  <span className="text-sm text-gray-600">AI-suggesties</span>
+                  <button
+                    onClick={() => setShowAISuggestions(!showAISuggestions)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${showAISuggestions ? 'bg-blue-600' : 'bg-gray-300'}`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${showAISuggestions ? 'translate-x-6' : 'translate-x-1'}`}
+                    />
+                  </button>
+                </div>
+
+
+        
             </div>
-          )}
-
-          {/* Toggle voor AI suggesties */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">AI-suggesties</span>
-            <button
-              onClick={() => setShowAISuggestions(!showAISuggestions)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${showAISuggestions ? 'bg-blue-600' : 'bg-gray-300'}`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${showAISuggestions ? 'translate-x-6' : 'translate-x-1'}`}
-              />
-            </button>
-          </div>
-
-          {/* Toggle voor het verbergen van gescoorde antwoorden */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Verberg gescoorde</span>
-            <button
-              onClick={toggleHideScored}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${hideScored ? 'bg-blue-600' : 'bg-gray-300'}`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${hideScored ? 'translate-x-6' : 'translate-x-1'}`}
-              />
-            </button>
-          </div>
 
 
-        </div>
-
-
-
-
-
-        {/* Scrollbare antwoorden container */}
-        <div className="pr-1" style={{ maxHeight: 'calc(80vh - 180px)' }}>
-          {/* Antwoordentabel zonder blauwe header */}
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden flex-grow relative">
-            {/* Kolomlabels */}
-            <div className="px-4 py-2 bg-gray-50 border-b border-gray-200 flex items-center">
-              <div className="flex-grow font-medium text-gray-700">Antwoord</div>
-              <div className="flex items-center">
-                <div className="w-32 text-center font-medium text-gray-700 mr-2">Score</div>
-                <div className="w-20 text-center font-medium text-gray-700">AI</div>
-              </div>
-            </div>
 
             {answerGroups.map((group, groupIndex) => {
               const filteredAnswers = getFilteredAnswers(group);
@@ -417,15 +519,26 @@ const ScoringSystem = () => {
               if (filteredAnswers.length === 0) return null;
 
               return (
-                <div key={groupIndex} className="border-b border-gray-200 last:border-b-0">
-                  <div className="bg-gray-100 px-4 py-2 font-medium text-gray-700 sticky z-10">
+                <div key={groupIndex} className="border-b last:border-b-0 mt-12">
+                  <div className="px-4 py-2 font-medium text-xs uppercase text-gray-700 sticky z-10">
                     {group.title}
+                    <div className="flex gap-2 mt-2">
+                      {[0, 1, 2].map(score => (
+                        <button
+                          key={score}
+                          onClick={() => handleGroupScoreChange(groupIndex, score)}
+                          className="w-8 h-8 rounded-full border flex items-center justify-center border-gray-300 text-gray-600"
+                        >
+                          {score}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   {filteredAnswers.map((answer) => (
                     <div
                       key={answer.id}
-                      className={`px-4 py-3 border-t border-gray-100 flex items-center hover:bg-gray-50 ${scores.hasOwnProperty(answer.id) && !hideScored ? 'bg-gray-50' : ''}`}
+                      className={`px-4 py-3 border-t border-gray-100 flex items-center bg-white `}
                       style={{
                         transition: 'all 0.5s ease',
                         maxHeight: animatingItems[answer.id] ? '0' : '100px',
@@ -487,91 +600,13 @@ const ScoringSystem = () => {
                       </div>
 
                       {/* AI-suggestie popup */}
-                      {activePopup === answer.id && (
-                        <div 
-                          className="fixed z-[9999] bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-96 right-24 mt-2 ai-suggestie-popup"
-                          style={{ zIndex: 9999 }}
-                        >
-                          <div className="flex justify-between items-start mb-3">
-                            <h3 className="font-bold text-gray-800">AI-suggestie toelichting</h3>
-                            <button
-                              onClick={() => setActivePopup(null)}
-                              className="text-gray-400 hover:text-gray-600"
-                            >
-                              ✕
-                            </button>
-                          </div>
-
-                          <div className="mb-4">
-                            <div className="flex items-center gap-2 mb-3">
-                              <span className="text-sm font-medium text-gray-600">Antwoord:</span>
-                              <span className="text-gray-800">"{highlightWaterWord(answer.text)}"</span>
-                            </div>
-
-                            <div className="flex flex-col mb-3">
-                              <div className="flex items-center mb-2">
-                                <span className="text-sm font-medium text-gray-600">Voorgestelde score:</span>
-                                <span className="ml-2 w-6 h-6 bg-purple-100 border border-purple-300 rounded-full inline-flex items-center justify-center font-bold text-sm text-purple-800">
-                                  {answer.aiScore}
-                                </span>
-                              </div>
-
-                              <div className="flex items-center">
-                                <span className="text-sm font-medium text-gray-600 mr-2">Zekerheid:</span>
-                                <div className="flex-grow">
-                                  <div className="w-full bg-gray-200 rounded-full h-2">
-                                    <div
-                                      className="h-2 rounded-full"
-                                      style={{
-                                        width: `${getAIExplanation(answer.id)?.confidence || 0}%`,
-                                        backgroundColor: `rgba(147, 51, 234, ${(getAIExplanation(answer.id)?.confidence || 0) / 100})`
-                                      }}
-                                    ></div>
-                                  </div>
-                                  <div className="text-xs text-right text-gray-600 mt-1">
-                                    {getAIExplanation(answer.id)?.confidence || 0}%
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="mb-4">
-                            <h4 className="font-medium text-gray-700 mb-2">Vergelijkbare antwoorden uit database:</h4>
-                            <div className="max-h-48 overflow-y-auto pr-2 mb-4">
-                              <table className="w-full text-sm">
-                                <thead className="bg-gray-50">
-                                  <tr>
-                                    <th className="text-left py-2 px-2">Antwoord</th>
-                                    <th className="text-center py-2 w-16">Score</th>
-                                    <th className="text-right py-2 px-2 w-24">Datum</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {getAIExplanation(answer.id)?.similarAnswers.map((similar, idx) => (
-                                    <tr key={idx} className="border-t border-gray-100">
-                                      <td className="py-2 px-2 text-gray-800">{highlightWaterWord(similar.text)}</td>
-                                      <td className="py-2 text-center">
-                                        <span className="w-6 h-6 bg-gray-100 border rounded-full inline-flex items-center justify-center text-xs font-medium text-gray-800">
-                                          {similar.score}
-                                        </span>
-                                      </td>
-                                      <td className="py-2 px-2 text-right text-gray-600">{similar.date}</td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-
-                            <div>
-                              <h4 className="font-medium text-gray-700 mb-2">AI feedback:</h4>
-                              <div className="text-sm text-gray-700 bg-purple-50 p-3 rounded-md border border-purple-100">
-                                {getAIExplanation(answer.id)?.explanation}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
+                      <AISuggestionPopup
+                        answer={answer}
+                        activePopup={activePopup}
+                        setActivePopup={setActivePopup}
+                        getAIExplanation={getAIExplanation}
+                        highlightWaterWord={highlightWaterWord}
+                      />
                     </div>
                   ))}
                 </div>
