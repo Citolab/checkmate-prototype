@@ -9,7 +9,7 @@ const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanati
       style={{ zIndex: 9999 }}
     >
       <div className="flex justify-between items-start mb-3">
-        <h3 className="font-bold text-gray-800">AI-suggestie toelichting</h3>
+        <h3 className="font-bold text-gray-800">Toelichting</h3>
         <button
           onClick={() => setActivePopup(null)}
           className="text-gray-400 hover:text-gray-600"
@@ -19,36 +19,23 @@ const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanati
       </div>
 
       <div className="mb-4">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-sm font-medium text-gray-600">Antwoord:</span>
-          <span className="text-gray-800">"{highlightWaterWord(answer.text)}"</span>
-        </div>
+
 
         <div className="flex flex-col mb-3">
           <div className="flex items-center mb-2">
             <span className="text-sm font-medium text-gray-600">Voorgestelde score:</span>
-            <span className="ml-2 w-6 h-6 bg-purple-100 border border-purple-300 rounded-full inline-flex items-center justify-center font-bold text-sm text-purple-800">
+            <span className="ml-2 w-8 h-8 bg-purple-100 border border-purple-300 rounded-full inline-flex items-center justify-center font-bold text-sm text-purple-800">
               {answer.aiScore}
             </span>
+            <span className="text-sm font-medium text-purple-600 ml-2">{getAIExplanation(answer.id)?.confidence || 0}% Zeker</span>
           </div>
 
-          <div className="flex items-center">
-            <span className="text-sm font-medium text-gray-600 mr-2">Zekerheid:</span>
-            <div className="flex-grow">
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="h-2 rounded-full"
-                  style={{
-                    width: `${getAIExplanation(answer.id)?.confidence || 0}%`,
-                    backgroundColor: `rgba(147, 51, 234, ${(getAIExplanation(answer.id)?.confidence || 0) / 100})`
-                  }}
-                ></div>
-              </div>
-              <div className="text-xs text-right text-gray-600 mt-1">
-                {getAIExplanation(answer.id)?.confidence || 0}%
-              </div>
-            </div>
-          </div>
+          {/* <div className="flex items-center gap-2 mb-3">
+            <span className="text-sm font-medium text-gray-600">Antwoord:</span>
+            <span className="text-gray-800">"{highlightWaterWord(answer.text)}"</span>
+          </div> */}
+
+
         </div>
       </div>
 
@@ -60,7 +47,7 @@ const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanati
               <tr>
                 <th className="text-left py-2 px-2">Antwoord</th>
                 <th className="text-center py-2 w-16">Score</th>
-                <th className="text-right py-2 px-2 w-24">Datum</th>
+                {/* <th className="text-right py-2 px-2 w-24">Datum</th> */}
               </tr>
             </thead>
             <tbody>
@@ -72,7 +59,7 @@ const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanati
                       {similar.score}
                     </span>
                   </td>
-                  <td className="py-2 px-2 text-right text-gray-600">{similar.date}</td>
+                  {/* <td className="py-2 px-2 text-right text-gray-600">{similar.date}</td> */}
                 </tr>
               ))}
             </tbody>
@@ -415,10 +402,10 @@ const ScoringSystem = () => {
 
         {/* Antwoordmodel los bovenin */}
         <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-500 text-white rounded-full text-xs font-bold">✓</span>
-              <h3 className="text-gray-700 font-semibold">Antwoordmodel</h3>
-            </div>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-500 text-white rounded-full text-xs font-bold">✓</span>
+            <h3 className="text-gray-700 font-semibold">Antwoordmodel</h3>
+          </div>
           <span className="text-lg font-bold text-gray-800 mt-2 bg-purple-200 px-1 rounded">{question.correctAnswer}</span>
         </div>
 
@@ -457,57 +444,57 @@ const ScoringSystem = () => {
             {/* Kolomlabels */}
             <div className="px-4 py-2 flex items-center justify-between">
               {/* <div className="flex-grow font-medium text-gray-700">Antwoord</div> */}
-                {/* <div className="w-32 text-center font-medium text-gray-700 mr-2">Score</div> */}
-                {/* <div className="w-20 text-center font-medium text-gray-700">AI</div> */}
-                {/* Toggle voor het verbergen van gescoorde antwoorden */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">Verberg gescoorde</span>
-                  <button
-                    onClick={toggleHideScored}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${hideScored ? 'bg-blue-600' : 'bg-gray-300'}`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${hideScored ? 'translate-x-6' : 'translate-x-1'}`}
-                    />
-                  </button>
-                </div>
+              {/* <div className="w-32 text-center font-medium text-gray-700 mr-2">Score</div> */}
+              {/* <div className="w-20 text-center font-medium text-gray-700">AI</div> */}
+              {/* Toggle voor het verbergen van gescoorde antwoorden */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">Verberg gescoorde</span>
+                <button
+                  onClick={toggleHideScored}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${hideScored ? 'bg-blue-600' : 'bg-gray-300'}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${hideScored ? 'translate-x-6' : 'translate-x-1'}`}
+                  />
+                </button>
+              </div>
 
 
-            {/* Add a button to apply all AI-suggested scores */}
-            {showAISuggestions && (
-              <button
-                onClick={() => {
-                  const newScores = {};
-                  answerGroups.forEach(group => {
-                    group.answers.forEach(answer => {
-                      if (answer.aiScore !== undefined) {
-                        newScores[answer.id] = answer.aiScore;
-                      }
+              {/* Add a button to apply all AI-suggested scores */}
+              {showAISuggestions && (
+                <button
+                  onClick={() => {
+                    const newScores = {};
+                    answerGroups.forEach(group => {
+                      group.answers.forEach(answer => {
+                        if (answer.aiScore !== undefined) {
+                          newScores[answer.id] = answer.aiScore;
+                        }
+                      });
                     });
-                  });
-                  setScores(prevScores => ({ ...prevScores, ...newScores }));
-                }}
-                className="bg-purple-100 text-purple-800 border border-purple-300 px-2 py-1 rounded-lg text-xs "
-              >
-                Pas alle AI-suggesties toe
-              </button>
-            )}
-            
-                {/* Toggle voor AI suggesties */}
-                <div className="flex items-center justify-end gap-2">
-                  <span className="text-sm text-gray-600">AI-suggesties</span>
-                  <button
-                    onClick={() => setShowAISuggestions(!showAISuggestions)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${showAISuggestions ? 'bg-blue-600' : 'bg-gray-300'}`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${showAISuggestions ? 'translate-x-6' : 'translate-x-1'}`}
-                    />
-                  </button>
-                </div>
+                    setScores(prevScores => ({ ...prevScores, ...newScores }));
+                  }}
+                  className="bg-purple-100 text-purple-800 border border-purple-300 px-2 py-1 rounded-lg text-xs "
+                >
+                  Pas alle AI-suggesties toe
+                </button>
+              )}
+
+              {/* Toggle voor AI suggesties */}
+              <div className="flex items-center justify-end gap-2">
+                <span className="text-sm text-gray-600">AI-suggesties</span>
+                <button
+                  onClick={() => setShowAISuggestions(!showAISuggestions)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${showAISuggestions ? 'bg-blue-600' : 'bg-gray-300'}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${showAISuggestions ? 'translate-x-6' : 'translate-x-1'}`}
+                  />
+                </button>
+              </div>
 
 
-        
+
             </div>
 
 
