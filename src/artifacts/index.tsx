@@ -476,10 +476,12 @@ const ScoringSystem = () => {
                           {/* AI-score or vraagteken button */}
                           <button
                             onClick={() => togglePopup(answer.id)}
-                            className={`ml-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors border ${scores[answer.id] === answer.aiScore || showAISuggestions || visibleAIScores[answer.id] ? 'bg-purple-100 text-purple-800 border-purple-300' : 'bg-white text-gray-800 border-gray-300'}`}
+                            className={`ml-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors border bg-purple-100 text-purple-800 border-purple-300`}
                             title="AI-suggestie (klik voor details)"
                           >
-                            {scores[answer.id] === answer.aiScore || showAISuggestions || visibleAIScores[answer.id] ? answer.aiScore : "?"}
+                            <span className={`${scores[answer.id] === answer.aiScore || showAISuggestions || visibleAIScores[answer.id] ? '' : 'blur-sm'}`}>
+                              {answer.aiScore}
+                            </span>
                           </button>
                         </div>
                       </div>
