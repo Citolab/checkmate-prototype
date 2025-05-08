@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import jsonData from "./data.json";
 
 const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanation, highlightWaterWord }) => {
   if (activePopup !== answer.id) return null;
@@ -9,7 +10,7 @@ const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanati
       style={{ zIndex: 9999 }}
     >
       <div className="flex justify-between items-start mb-3">
-        <h3 className="font-bold text-gray-800">Toelichting</h3>
+        <h3 className="font-bold text-gray-800">AI-suggestie toelichting</h3>
         <button
           onClick={() => setActivePopup(null)}
           className="text-gray-400 hover:text-gray-600"
@@ -19,35 +20,48 @@ const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanati
       </div>
 
       <div className="mb-4">
-
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-sm font-medium text-gray-600">Antwoord:</span>
+          <span className="text-gray-800">"{highlightWaterWord(answer.text)}"</span>
+        </div>
 
         <div className="flex flex-col mb-3">
           <div className="flex items-center mb-2">
             <span className="text-sm font-medium text-gray-600">Voorgestelde score:</span>
-            <span className="ml-2 w-8 h-8 bg-purple-100 border border-purple-300 rounded-full inline-flex items-center justify-center font-bold text-sm text-purple-800">
+            <span className="ml-2 w-6 h-6 bg-purple-100 border border-purple-300 rounded-full inline-flex items-center justify-center font-bold text-sm text-purple-800">
               {answer.aiScore}
             </span>
-            <span className="text-sm font-medium text-purple-600 ml-2">{getAIExplanation(answer.id)?.confidence || 0}% Zeker</span>
           </div>
 
-          {/* <div className="flex items-center gap-2 mb-3">
-            <span className="text-sm font-medium text-gray-600">Antwoord:</span>
-            <span className="text-gray-800">"{highlightWaterWord(answer.text)}"</span>
-          </div> */}
-
-
+          <div className="flex items-center">
+            <span className="text-sm font-medium text-gray-600 mr-2">Zekerheid:</span>
+            <div className="flex-grow">
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="h-2 rounded-full"
+                  style={{
+                    width: `${getAIExplanation(answer.id)?.confidence || 0}%`,
+                    backgroundColor: `rgba(147, 51, 234, ${(getAIExplanation(answer.id)?.confidence || 0) / 100})`
+                  }}
+                ></div>
+              </div>
+              <div className="text-xs text-right text-gray-600 mt-1">
+                {getAIExplanation(answer.id)?.confidence || 0}%
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="mb-4">
-        <h4 className="font-medium text-gray-700 mb-2 text-sm">Door scores van vergelijkbare antwoorden:</h4>
+        <h4 className="font-medium text-gray-700 mb-2">Vergelijkbare antwoorden uit database:</h4>
         <div className="max-h-48 overflow-y-auto pr-2 mb-4">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
                 <th className="text-left py-2 px-2">Antwoord</th>
                 <th className="text-center py-2 w-16">Score</th>
-                {/* <th className="text-right py-2 px-2 w-24">Datum</th> */}
+                <th className="text-right py-2 px-2 w-24">Datum</th>
               </tr>
             </thead>
             <tbody>
@@ -59,7 +73,7 @@ const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanati
                       {similar.score}
                     </span>
                   </td>
-                  {/* <td className="py-2 px-2 text-right text-gray-600">{similar.date}</td> */}
+                  <td className="py-2 px-2 text-right text-gray-600">{similar.date}</td>
                 </tr>
               ))}
             </tbody>
@@ -90,72 +104,10 @@ const ScoringSystem = () => {
   const rightColumnRef = useRef(null);
 
   // Vraag en antwoordmodel
-  const question = {
-    title: "Salamander",
-    text: "De kamsalamander is zeer zeldzaam in Nederland. Hij leeft vooral in de buurt van bossen en heggen. De voortplanting vindt plaats in water. Een vrouwtje legt dan zo'n 200 eieren. De larven eten watervlooien.",
-    instruction: "Noteer de abiotische factor uit de tekst die voor de kamsalamander belangrijk is.",
-    correctAnswer: "water"
-  };
+  const question = jsonData.question;
 
   // AI-uitleg voor antwoorden
-  const aiExplanations = {
-    1: {
-      explanation: "Dit antwoord noemt direct en correct 'water' als abiotische factor. Water is essentieel voor de voortplanting van de kamsalamander zoals vermeld in de tekst.",
-      similarAnswers: [
-        { text: "water", score: 2, date: "12-04-2025" },
-        { text: "Het water", score: 2, date: "23-03-2025" },
-        { text: "water als abiotische factor", score: 2, date: "05-02-2025" },
-        { text: "Water voor voortplanting", score: 2, date: "18-01-2025" }
-      ],
-      confidence: 98
-    },
-    2: {
-      explanation: "Dit antwoord noemt correct 'Water' met een hoofdletter en een punt, maar benoemt dezelfde correcte abiotische factor als het juiste antwoord.",
-      similarAnswers: [
-        { text: "Water.", score: 2, date: "27-03-2025" },
-        { text: "Water", score: 2, date: "14-02-2025" },
-        { text: "Het water.", score: 2, date: "19-01-2025" }
-      ],
-      confidence: 97
-    },
-    3: {
-      explanation: "Dit antwoord beschrijft de leefomgeving van de kamsalamander maar noemt geen abiotische factor. Bossen en heggen zijn biotische factoren (levende organismen), terwijl de vraag specifiek naar een abiotische factor vroeg.",
-      similarAnswers: [
-        { text: "leeft in de buurt van bossen", score: 0, date: "15-04-2025" },
-        { text: "in de buurt van heggen", score: 0, date: "22-03-2025" },
-        { text: "omgeving met bossen", score: 0, date: "09-02-2025" },
-        { text: "bij bosgebieden en heggen", score: 0, date: "21-01-2025" }
-      ],
-      confidence: 94
-    },
-    8: {
-      explanation: "Dit antwoord noemt 'temperatuur' als abiotische factor, wat op zich correct is als abiotische factor, maar niet expliciet genoemd wordt in de tekst als belangrijk voor de kamsalamander. Het krijgt daarom een gedeeltelijke score.",
-      similarAnswers: [
-        { text: "temperatuur", score: 1, date: "29-03-2025" },
-        { text: "de temperatuur van het water", score: 1, date: "12-02-2025" },
-        { text: "omgevingstemperatuur", score: 1, date: "05-01-2025" }
-      ],
-      confidence: 82
-    },
-    11: {
-      explanation: "Dit antwoord bevat 'water' als correcte abiotische factor, maar noemt ook bossen en heggen, wat biotische factoren zijn. Het krijgt een gedeeltelijke score omdat het juiste antwoord erin zit, maar vermengd met incorrecte elementen.",
-      similarAnswers: [
-        { text: "omgeving met water en bossen", score: 1, date: "18-04-2025" },
-        { text: "bossen, heggen en wateromgeving", score: 1, date: "03-03-2025" },
-        { text: "natuurlijke omgeving met water", score: 1, date: "27-01-2025" }
-      ],
-      confidence: 85
-    },
-    14: {
-      explanation: "Dit antwoord bevat 'water' als correcte abiotische factor, maar noemt ook bossen en heggen, wat biotische factoren zijn. Het krijgt een gedeeltelijke score omdat het juiste antwoord erin zit, maar vermengd met incorrecte elementen.",
-      similarAnswers: [
-        { text: "water en bossen", score: 1, date: "11-04-2025" },
-        { text: "water, bossen en begroeiing", score: 1, date: "25-02-2025" },
-        { text: "water in bosrijke omgeving", score: 1, date: "08-01-2025" }
-      ],
-      confidence: 88
-    }
-  };
+  const aiExplanations = jsonData.aiExplanations;
 
   // Voor antwoorden zonder specifieke uitleg
   const getDefaultExplanation = (answerId, score) => {
@@ -188,39 +140,7 @@ const ScoringSystem = () => {
   };
 
   // Antwoorden gegroepeerd
-  const answerGroups = [
-    {
-      title: "Correcte antwoorden",
-      answers: [
-        { id: 1, text: "water", aiScore: 2 },
-        { id: 2, text: "Water.", aiScore: 2 }
-      ]
-    },
-    {
-      title: "Omgeving-gerelateerde antwoorden",
-      answers: [
-        { id: 3, text: "leeft vooral in de buurt van bossen en heggen", aiScore: 0 },
-        { id: 4, text: "Hij leeft vooral in de buurt van bossen en heggen.", aiScore: 0 },
-        { id: 5, text: "bossen en heggen", aiScore: 0 },
-        { id: 6, text: "leven in buurt van bossen en heggen", aiScore: 0 }
-      ]
-    },
-    {
-      title: "Overige antwoorden",
-      answers: [
-        { id: 7, text: "nestgelegenheden", aiScore: 0 },
-        { id: 8, text: "de temperatuur", aiScore: 1 },
-        { id: 9, text: "andere dieren die de eitjes op eten", aiScore: 0 },
-        { id: 10, text: "watervlooien", aiScore: 0 },
-        { id: 11, text: "omgeving (bossen, heggen en water in de buurt)", aiScore: 1 },
-        { id: 12, text: "bosgroei", aiScore: 0 },
-        { id: 13, text: "de larven eten de watervlooien op.", aiScore: 0 },
-        { id: 14, text: "water bossen en heggen", aiScore: 1 },
-        { id: 15, text: "vele verschillende kleuren", aiScore: 0 },
-        { id: 16, text: "de kamsalamander is zeer zeldzaam in Nederland.", aiScore: 0 }
-      ]
-    }
-  ];
+  const answerGroups = jsonData.answerGroups;
 
   // Effect om automatisch correcte antwoorden in te vullen bij eerste render
   useEffect(() => {
