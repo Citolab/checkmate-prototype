@@ -286,6 +286,19 @@ const ScoringSystem = () => {
       {/* Linker kolom - Vraag */}
       <div className="w-1/3 mr-6">
 
+        {/* Progress Circles for Items */}
+        <div className="flex justify-center items-center mb-4">
+          {[...Array(12)].map((_, index) => (
+            <div
+              key={index}
+              className={`w-6 h-6 rounded-full mx-1 flex items-center justify-center text-xs font-bold
+                ${index < 5 ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'}`}
+            >
+              {index + 1}
+            </div>
+          ))}
+        </div>
+        
         <div className="bg-gray-100 p-4 rounded-lg shadow-sm mb-4">
           <div className="flex justify-between items-center mb-2">
             <div className="text-sm font-medium text-gray-700">Voortgang beoordeling</div>
@@ -300,6 +313,8 @@ const ScoringSystem = () => {
             </div>
           </div>
         </div>
+
+
 
         {/* Antwoordmodel los bovenin */}
         <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
