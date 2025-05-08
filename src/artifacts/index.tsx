@@ -313,7 +313,7 @@ const ScoringSystem = () => {
       </div>
 
       {/* Rechter kolom - Antwoordmodel en antwoorden */}
-      <div ref={rightColumnRef} className="flex-1 flex flex-col max-h-[80vh] overflow-hidden">
+      <div ref={rightColumnRef} className="flex-1 flex flex-col">
         {/* Voortgangsbalk in grijze gebied */}
         <div className="bg-gray-100 p-4 rounded-lg shadow-sm mb-4">
           <div className="flex justify-between items-center mb-2">
@@ -398,17 +398,9 @@ const ScoringSystem = () => {
 
 
         {/* Scrollbare antwoorden container */}
-        <div className="overflow-y-auto pr-1" style={{ maxHeight: 'calc(80vh - 180px)' }}>
+        <div className="pr-1" style={{ maxHeight: 'calc(80vh - 180px)' }}>
           {/* Antwoordentabel zonder blauwe header */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden flex-grow relative">
-            {/* Subtiele leerlingantwoorden kop */}
-            <div className="px-4 pt-3 pb-1 flex justify-between items-center">
-              <h3 className="text-gray-700 font-medium">Leerlingantwoorden</h3>
-              <div className="text-gray-500 text-sm">
-                <span>Aantal: {answerGroups.reduce((sum, group) => sum + group.answers.length, 0)}</span>
-              </div>
-            </div>
-
             {/* Kolomlabels */}
             <div className="px-4 py-2 bg-gray-50 border-b border-gray-200 flex items-center">
               <div className="flex-grow font-medium text-gray-700">Antwoord</div>
@@ -426,7 +418,7 @@ const ScoringSystem = () => {
 
               return (
                 <div key={groupIndex} className="border-b border-gray-200 last:border-b-0">
-                  <div className="bg-gray-100 px-4 py-2 font-medium text-gray-700 sticky top-16 z-10">
+                  <div className="bg-gray-100 px-4 py-2 font-medium text-gray-700 sticky z-10">
                     {group.title}
                   </div>
 
@@ -472,7 +464,7 @@ const ScoringSystem = () => {
                             disabled={!showAISuggestions && !visibleAIScores[answer.id] || scores[answer.id] === answer.aiScore}
                             className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors
                               ${scores[answer.id] === answer.aiScore || (!showAISuggestions && !visibleAIScores[answer.id]) ?
-                                'bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed' :
+                                'bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed invisible' :
                                 'bg-blue-100 hover:bg-blue-200 text-blue-600 border border-blue-300'}`}
                             title={scores[answer.id] === answer.aiScore ? "Score is al gelijk aan AI-suggestie" : "Overnemen van AI-suggestie"}
                           >
@@ -481,21 +473,21 @@ const ScoringSystem = () => {
                             </svg>
                           </button>
 
-                          {/* AI-score of vraagteken button (altijd zichtbaar) */}
+                          {/* AI-score or vraagteken button */}
                           <button
                             onClick={() => togglePopup(answer.id)}
-                            className="ml-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors bg-purple-100 text-purple-800 border border-purple-300"
+                            className={`ml-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors border ${scores[answer.id] === answer.aiScore || showAISuggestions || visibleAIScores[answer.id] ? 'bg-purple-100 text-purple-800 border-purple-300' : 'bg-white text-gray-800 border-gray-300'}`}
                             title="AI-suggestie (klik voor details)"
                           >
-                            {showAISuggestions || visibleAIScores[answer.id] ? answer.aiScore : "?"}
+                            {scores[answer.id] === answer.aiScore || showAISuggestions || visibleAIScores[answer.id] ? answer.aiScore : "?"}
                           </button>
                         </div>
                       </div>
 
                       {/* AI-suggestie popup */}
                       {activePopup === answer.id && (
-                        <div
-                          className="absolute z-[9999] bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-96 right-24 mt-2 ai-suggestie-popup"
+                        <div 
+                          className="fixed z-[9999] bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-96 right-24 mt-2 ai-suggestie-popup"
                           style={{ zIndex: 9999 }}
                         >
                           <div className="flex justify-between items-start mb-3">
