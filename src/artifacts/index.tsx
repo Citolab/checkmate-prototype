@@ -8,10 +8,10 @@ const ScoringSystem = () => {
   const [hideScored, setHideScored] = useState(false); // Default uit
   const [animatingItems, setAnimatingItems] = useState({});
   const [visibleAIScores, setVisibleAIScores] = useState({}); // Voor individuele AI-scores
-  
+
   // Ref voor scrolling
   const rightColumnRef = useRef(null);
-  
+
   // Vraag en antwoordmodel
   const question = {
     title: "Salamander",
@@ -19,7 +19,7 @@ const ScoringSystem = () => {
     instruction: "Noteer de abiotische factor uit de tekst die voor de kamsalamander belangrijk is.",
     correctAnswer: "water"
   };
-  
+
   // AI-uitleg voor antwoorden
   const aiExplanations = {
     1: {
@@ -79,16 +79,16 @@ const ScoringSystem = () => {
       confidence: 88
     }
   };
-  
+
   // Voor antwoorden zonder specifieke uitleg
   const getDefaultExplanation = (answerId, score) => {
     const answer = answerGroups.flatMap(g => g.answers).find(a => a.id === answerId);
     if (!answer) return null;
-    
+
     let explanation = "";
     let similarAnswers = [];
     let confidence = 0;
-    
+
     if (score === 0) {
       explanation = `Het antwoord "${answer.text}" bevat geen correcte abiotische factor voor de kamsalamander. De tekst geeft aan dat water de belangrijke abiotische factor is, maar dit wordt niet genoemd in het antwoord.`;
       similarAnswers = [
@@ -106,10 +106,10 @@ const ScoringSystem = () => {
       ];
       confidence = 75;
     }
-    
+
     return { explanation, similarAnswers, confidence };
   };
-  
+
   // Antwoorden gegroepeerd
   const answerGroups = [
     {
@@ -144,14 +144,14 @@ const ScoringSystem = () => {
       ]
     }
   ];
-  
+
   // Effect om automatisch correcte antwoorden in te vullen bij eerste render
   useEffect(() => {
     // Haal alle antwoorden uit de "Correcte antwoorden" groep
     const correctGroup = answerGroups.find(group => group.title === "Correcte antwoorden");
     if (correctGroup) {
       const correctAnswers = correctGroup.answers;
-      
+
       // Voeg score 2 toe voor water en Water. antwoorden
       const correctScores = {};
       correctAnswers.forEach(answer => {
@@ -160,7 +160,7 @@ const ScoringSystem = () => {
           correctScores[answer.id] = 2;
         }
       });
-      
+
       // Update de scores state zonder bestaande scores te overschrijven
       setScores(prevScores => ({
         ...prevScores,
@@ -168,7 +168,22 @@ const ScoringSystem = () => {
       }));
     }
   }, []);
-  
+
+  // Add a click event listener to close the popup when clicking outside of it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (activePopup && !event.target.closest('.ai-suggestie-popup')) {
+        setActivePopup(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activePopup]);
+
   // Score toekennen of verwijderen
   const handleScoreChange = (answerId, score) => {
     // Als dezelfde score opnieuw wordt aangeklikt, verwijder de score
@@ -182,11 +197,11 @@ const ScoringSystem = () => {
         ...scores,
         [answerId]: score
       });
-      
+
       // Als we gescoorde items verbergen, voeg dit item toe aan animerende items
       if (hideScored) {
         setAnimatingItems(prev => ({ ...prev, [answerId]: true }));
-        
+
         // Verwijder het item uit animerende items na animatie
         setTimeout(() => {
           setAnimatingItems(prev => {
@@ -198,7 +213,7 @@ const ScoringSystem = () => {
       }
     }
   };
-  
+
   // Toggle voor het verbergen van gescoorde antwoorden
   const toggleHideScored = () => {
     if (!hideScored) {
@@ -207,9 +222,9 @@ const ScoringSystem = () => {
       Object.keys(scores).forEach(id => {
         animating[id] = true;
       });
-      
+
       setAnimatingItems(animating);
-      
+
       // Na de animatie de toggle updaten
       setTimeout(() => {
         setHideScored(true);
@@ -220,14 +235,14 @@ const ScoringSystem = () => {
       setHideScored(false);
     }
   };
-  
+
   // Popup tonen/verbergen
   const togglePopup = (answerId) => {
     if (activePopup === answerId) {
       setActivePopup(null);
     } else {
       setActivePopup(answerId);
-      
+
       // Als AI-suggesties niet standaard zichtbaar zijn, maak deze specifieke zichtbaar
       if (!showAISuggestions) {
         setVisibleAIScores(prev => ({
@@ -237,12 +252,12 @@ const ScoringSystem = () => {
       }
     }
   };
-  
+
   // Antwoord opzoeken voor popup
   const getAnswerById = (id) => {
     return answerGroups.flatMap(g => g.answers).find(a => a.id === id);
   };
-  
+
   // AI-uitleg ophalen
   const getAIExplanation = (answerId) => {
     if (aiExplanations[answerId]) {
@@ -252,33 +267,33 @@ const ScoringSystem = () => {
       return getDefaultExplanation(answerId, answer.aiScore);
     }
   };
-  
+
   // Tekst markeren voor het woord 'water'
   const highlightWaterWord = (text) => {
     // Gebruik regex om alle instanties van 'water' (case-insensitive) te vinden
     // en vervang ze met gemarkeerde versie
     const regex = /(water)/gi;
     const parts = text.split(regex);
-    
+
     return parts.map((part, index) => {
       if (part.toLowerCase() === 'water') {
-        return <span key={index} className="bg-yellow-200 px-1 rounded">{part}</span>;
+        return <span key={index} className="bg-purple-200 px-1 rounded">{part}</span>;
       }
       return part;
     });
   };
-  
+
   // Bepaal welke antwoorden getoond moeten worden op basis van filters
   const getFilteredAnswers = (group) => {
     if (!hideScored) {
       return group.answers;
     }
-    
+
     return group.answers.filter(answer => !scores.hasOwnProperty(answer.id) || animatingItems[answer.id]);
   };
-  
+
   return (
-    <div className="flex bg-gray-50 p-6 rounded-lg shadow-md max-w-7xl mx-auto">
+    <div className="flex bg-gray-50 p-6 rounded-lg h-dvh mx-auto">
       {/* Linker kolom - Vraag */}
       <div className="w-1/4 mr-6">
         <div className="bg-white p-6 rounded-lg shadow-sm">
@@ -288,15 +303,15 @@ const ScoringSystem = () => {
             <h3 className="font-semibold text-gray-800">{question.instruction}</h3>
           </div>
           <div className="mt-4">
-            <img 
-              src="/api/placeholder/260/180" 
+            <img
+              src="/api/placeholder/260/180"
               alt="Afbeelding van een kamsalamander"
               className="rounded-lg mx-auto"
             />
           </div>
         </div>
       </div>
-      
+
       {/* Rechter kolom - Antwoordmodel en antwoorden */}
       <div ref={rightColumnRef} className="flex-1 flex flex-col max-h-[80vh] overflow-hidden">
         {/* Voortgangsbalk in grijze gebied */}
@@ -308,13 +323,13 @@ const ScoringSystem = () => {
             </div>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2.5">
-            <div 
-              className="bg-blue-600 h-2.5 rounded-full" 
+            <div
+              className="bg-blue-600 h-2.5 rounded-full"
               style={{ width: `${(Object.keys(scores).length / answerGroups.reduce((sum, group) => sum + group.answers.length, 0)) * 100}%` }}>
             </div>
           </div>
         </div>
-        
+
         {/* Antwoordmodel los bovenin */}
         <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
           <div className="flex items-center justify-between">
@@ -323,13 +338,36 @@ const ScoringSystem = () => {
           </div>
           <p className="text-lg font-bold text-gray-800 mt-2">{question.correctAnswer}</p>
         </div>
-        
+
         {/* Toggles direct boven leerlingantwoorden */}
-        <div className="flex justify-end mb-3 gap-6">
+        <div className="flex justify-end items-center mb-3 gap-6">
+
+          {/* Add a button to apply all AI-suggested scores */}
+          {showAISuggestions && (
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={() => {
+                  const newScores = {};
+                  answerGroups.forEach(group => {
+                    group.answers.forEach(answer => {
+                      if (answer.aiScore !== undefined) {
+                        newScores[answer.id] = answer.aiScore;
+                      }
+                    });
+                  });
+                  setScores(prevScores => ({ ...prevScores, ...newScores }));
+                }}
+                className="bg-purple-100 text-purple-800 border border-purple-300 px-2 py-1 rounded-lg text-sm "
+              >
+                Pas alle AI-suggesties toe
+              </button>
+            </div>
+          )}
+
           {/* Toggle voor AI suggesties */}
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">AI-suggesties</span>
-            <button 
+            <button
               onClick={() => setShowAISuggestions(!showAISuggestions)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${showAISuggestions ? 'bg-blue-600' : 'bg-gray-300'}`}
             >
@@ -338,11 +376,11 @@ const ScoringSystem = () => {
               />
             </button>
           </div>
-          
+
           {/* Toggle voor het verbergen van gescoorde antwoorden */}
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">Verberg gescoorde</span>
-            <button 
+            <button
               onClick={toggleHideScored}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${hideScored ? 'bg-blue-600' : 'bg-gray-300'}`}
             >
@@ -351,8 +389,14 @@ const ScoringSystem = () => {
               />
             </button>
           </div>
+
+
         </div>
-        
+
+
+
+
+
         {/* Scrollbare antwoorden container */}
         <div className="overflow-y-auto pr-1" style={{ maxHeight: 'calc(80vh - 180px)' }}>
           {/* Antwoordentabel zonder blauwe header */}
@@ -364,7 +408,7 @@ const ScoringSystem = () => {
                 <span>Aantal: {answerGroups.reduce((sum, group) => sum + group.answers.length, 0)}</span>
               </div>
             </div>
-            
+
             {/* Kolomlabels */}
             <div className="px-4 py-2 bg-gray-50 border-b border-gray-200 flex items-center">
               <div className="flex-grow font-medium text-gray-700">Antwoord</div>
@@ -373,22 +417,22 @@ const ScoringSystem = () => {
                 <div className="w-20 text-center font-medium text-gray-700">AI</div>
               </div>
             </div>
-            
+
             {answerGroups.map((group, groupIndex) => {
               const filteredAnswers = getFilteredAnswers(group);
-              
+
               // Skip this group if it has no visible answers
               if (filteredAnswers.length === 0) return null;
-              
+
               return (
                 <div key={groupIndex} className="border-b border-gray-200 last:border-b-0">
                   <div className="bg-gray-100 px-4 py-2 font-medium text-gray-700 sticky top-16 z-10">
                     {group.title}
                   </div>
-                  
+
                   {filteredAnswers.map((answer) => (
-                    <div 
-                      key={answer.id} 
+                    <div
+                      key={answer.id}
                       className={`px-4 py-3 border-t border-gray-100 flex items-center hover:bg-gray-50 ${scores.hasOwnProperty(answer.id) && !hideScored ? 'bg-gray-50' : ''}`}
                       style={{
                         transition: 'all 0.5s ease',
@@ -400,7 +444,7 @@ const ScoringSystem = () => {
                       <div className="flex-grow">
                         <p className={`text-gray-800 ${scores.hasOwnProperty(answer.id) && !hideScored ? 'text-gray-500' : ''}`}>{highlightWaterWord(answer.text)}</p>
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
                         {/* Docent scoring buttons met label */}
                         <div className="flex gap-2 justify-center" style={{ width: '132px' }}>
@@ -409,17 +453,17 @@ const ScoringSystem = () => {
                               key={score}
                               onClick={() => handleScoreChange(answer.id, score)}
                               className={`w-8 h-8 rounded-full border flex items-center justify-center
-                                ${scores[answer.id] === score ? 
-                                  (score === answer.aiScore ? 
-                                    'bg-purple-600 text-white border-purple-600' : 
-                                    'bg-gray-700 text-white border-gray-700') : 
+                                ${scores[answer.id] === score ?
+                                  (score === answer.aiScore ?
+                                    'bg-purple-600 text-white border-purple-600' :
+                                    'bg-gray-700 text-white border-gray-700') :
                                   'border-gray-300 text-gray-600'}`}
                             >
                               {score}
                             </button>
                           ))}
                         </div>
-                        
+
                         {/* AI-suggestie of vraagteken knop */}
                         <div className="flex items-center justify-center" style={{ width: '80px' }}>
                           {/* Pijl om AI-suggestie over te nemen (altijd zichtbaar maar mogelijk disabled) */}
@@ -436,7 +480,7 @@ const ScoringSystem = () => {
                               <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
                             </svg>
                           </button>
-                          
+
                           {/* AI-score of vraagteken button (altijd zichtbaar) */}
                           <button
                             onClick={() => togglePopup(answer.id)}
@@ -447,26 +491,29 @@ const ScoringSystem = () => {
                           </button>
                         </div>
                       </div>
-                      
+
                       {/* AI-suggestie popup */}
                       {activePopup === answer.id && (
-                        <div className="absolute z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-96 right-24 mt-2" style={{ zIndex: 9999 }}>
+                        <div
+                          className="absolute z-[9999] bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-96 right-24 mt-2 ai-suggestie-popup"
+                          style={{ zIndex: 9999 }}
+                        >
                           <div className="flex justify-between items-start mb-3">
                             <h3 className="font-bold text-gray-800">AI-suggestie toelichting</h3>
-                            <button 
+                            <button
                               onClick={() => setActivePopup(null)}
                               className="text-gray-400 hover:text-gray-600"
                             >
                               ✕
                             </button>
                           </div>
-                          
+
                           <div className="mb-4">
                             <div className="flex items-center gap-2 mb-3">
                               <span className="text-sm font-medium text-gray-600">Antwoord:</span>
                               <span className="text-gray-800">"{highlightWaterWord(answer.text)}"</span>
                             </div>
-                            
+
                             <div className="flex flex-col mb-3">
                               <div className="flex items-center mb-2">
                                 <span className="text-sm font-medium text-gray-600">Voorgestelde score:</span>
@@ -474,16 +521,16 @@ const ScoringSystem = () => {
                                   {answer.aiScore}
                                 </span>
                               </div>
-                              
+
                               <div className="flex items-center">
                                 <span className="text-sm font-medium text-gray-600 mr-2">Zekerheid:</span>
                                 <div className="flex-grow">
                                   <div className="w-full bg-gray-200 rounded-full h-2">
-                                    <div 
-                                      className="h-2 rounded-full" 
-                                      style={{ 
+                                    <div
+                                      className="h-2 rounded-full"
+                                      style={{
                                         width: `${getAIExplanation(answer.id)?.confidence || 0}%`,
-                                        backgroundColor: `rgba(147, 51, 234, ${(getAIExplanation(answer.id)?.confidence || 0) / 100})` 
+                                        backgroundColor: `rgba(147, 51, 234, ${(getAIExplanation(answer.id)?.confidence || 0) / 100})`
                                       }}
                                     ></div>
                                   </div>
@@ -494,7 +541,7 @@ const ScoringSystem = () => {
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="mb-4">
                             <h4 className="font-medium text-gray-700 mb-2">Vergelijkbare antwoorden uit database:</h4>
                             <div className="max-h-48 overflow-y-auto pr-2 mb-4">
@@ -521,7 +568,7 @@ const ScoringSystem = () => {
                                 </tbody>
                               </table>
                             </div>
-                            
+
                             <div>
                               <h4 className="font-medium text-gray-700 mb-2">AI feedback:</h4>
                               <div className="text-sm text-gray-700 bg-purple-50 p-3 rounded-md border border-purple-100">
