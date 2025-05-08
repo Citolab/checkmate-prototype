@@ -40,7 +40,7 @@ const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanati
       </div>
 
       <div className="mb-4">
-        <h4 className="font-medium text-gray-700 mb-2">Vergelijkbare antwoorden uit database:</h4>
+        <h4 className="font-medium text-gray-700 mb-2 text-sm">Door scores van vergelijkbare antwoorden:</h4>
         <div className="max-h-48 overflow-y-auto pr-2 mb-4">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
