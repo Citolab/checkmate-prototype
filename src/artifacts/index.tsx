@@ -512,21 +512,21 @@ const ScoringSystem = () => {
                           {/* AI-suggestie or vraagteken knop */}
                           <div className="flex items-center justify-center" style={{ width: '80px' }}>
                             {/* Pijl om AI-suggestie over te nemen (altijd zichtbaar maar mogelijk disabled) */}
-
-                          <button
-                            onClick={() => handleScoreChange(answer.id, answer.aiScore)}
-                            disabled={!showAISuggestions && !visibleAIScores[answer.id] || scores[answer.id] === answer.aiScore}
-                            className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors
+                              <button
+                                onClick={() => handleScoreChange(answer.id, answer.aiScore)}
+                                disabled={!showAISuggestions && !visibleAIScores[answer.id] || scores[answer.id] === answer.aiScore}
+                                className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors
+                              ${answer.confidence <= 10 ? `invisible` : ''}    
                               ${scores[answer.id] === answer.aiScore || (!showAISuggestions && !visibleAIScores[answer.id]) ?
-                                'bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed invisible' :
-                                'bg-blue-100 hover:bg-blue-200 text-blue-600 border border-blue-300'}`}
-                            title={scores[answer.id] === answer.aiScore ? "Score is al gelijk aan AI-suggestie" : "Overnemen van AI-suggestie"}
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
-                            </svg>
-                          </button>
-                            
+                                    'bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed invisible' :
+                                    'bg-blue-100 hover:bg-blue-200 text-blue-600 border border-blue-300'}`}
+                                title={scores[answer.id] === answer.aiScore ? "Score is al gelijk aan AI-suggestie" : "Overnemen van AI-suggestie"}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                                </svg>
+                              </button>
+
 
                             {answer.confidence > 10 ? (
                               <Tooltip>
@@ -542,7 +542,7 @@ const ScoringSystem = () => {
                                   </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                 {!scores[answer.id] === answer.aiScore || showAISuggestions || visibleAIScores[answer.id] ? 'Toon AI redenering achter score' : 'Toon AI score'}
+                                  {!scores[answer.id] === answer.aiScore || showAISuggestions || visibleAIScores[answer.id] ? 'Toon AI redenering achter score' : 'Toon AI score'}
                                 </TooltipContent>
                               </Tooltip>
                             ) : (
@@ -550,13 +550,12 @@ const ScoringSystem = () => {
                                 <TooltipTrigger asChild>
                                   <button
                                     className={`ml-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors border bg-white text-gray-400 border-gray-300`}
-                                    title="Geen AI-suggestie beschikbaar"
                                   >
                                     ?
                                   </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  Not enough data to predict AI score
+                                  Geen AI-suggestie beschikbaar
                                 </TooltipContent>
                               </Tooltip>
                             )}
@@ -578,8 +577,8 @@ const ScoringSystem = () => {
                 );
               })}
             </div>
-                        <button
-              
+            <button
+
               className="bg-blue-600 mt-4 float-right text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
             >
               Volgende vraag
