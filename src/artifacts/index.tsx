@@ -42,40 +42,52 @@ const AISuggestionPopup = ({
               {answer.aiScore}
             </span>
 
+
+
             <span className="text-sm text-purple-600 ml-2">
               {getAIExplanation(answer.id)?.confidence || 0}% zeker
             </span>
           </div>
 
           {/* Thumbs up and down for feedback using SVG icons */}
-          <div className="flex items-center mt-2 space-x-2">
-            <button
-              className="w-8 h-8 fill-green-600 rounded-full flex items-center justify-center text-sm font-semibold transition-colors bg-green-100 text-green-600 border border-green-300"
-              title="Thumbs up - Agree with AI suggestion"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                className="w-5 h-5"
+          <div className="flex items-center justify-between space-x-2">
+
+            <div className="flex items-center mt-2 space-x-2">
+              <button
+                className="w-8 h-8 fill-green-600 rounded-full flex items-center justify-center text-sm font-semibold transition-colors bg-green-100 text-green-600 border border-green-300"
+                title="Thumbs up - Agree with AI suggestion"
               >
-                <title>thumb-up</title>
-                <path d="M23,10C23,8.89 22.1,8 21,8H14.68L15.64,3.43C15.66,3.33 15.67,3.22 15.67,3.11C15.67,2.7 15.5,2.32 15.23,2.05L14.17,1L7.59,7.58C7.22,7.95 7,8.45 7,9V19A2,2 0 0,0 9,21H18C18.83,21 19.54,20.5 19.84,19.78L22.86,12.73C22.95,12.5 23,12.26 23,12V10M1,21H5V9H1V21Z" />
-              </svg>
-            </button>
-            <button
-              className="w-8 h-8 fill-red-600 rounded-full flex items-center justify-center text-sm font-semibold transition-colors bg-red-100 text-red-600 border border-red-300"
-              title="Thumbs down - Disagree with AI suggestion"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                className="w-5 h-5"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  className="w-5 h-5"
+                >
+                  <title>thumb-up</title>
+                  <path d="M23,10C23,8.89 22.1,8 21,8H14.68L15.64,3.43C15.66,3.33 15.67,3.22 15.67,3.11C15.67,2.7 15.5,2.32 15.23,2.05L14.17,1L7.59,7.58C7.22,7.95 7,8.45 7,9V19A2,2 0 0,0 9,21H18C18.83,21 19.54,20.5 19.84,19.78L22.86,12.73C22.95,12.5 23,12.26 23,12V10M1,21H5V9H1V21Z" />
+                </svg>
+              </button>
+              <button
+                className="w-8 h-8 fill-red-600 rounded-full flex items-center justify-center text-sm font-semibold transition-colors bg-red-100 text-red-600 border border-red-300"
+                title="Thumbs down - Disagree with AI suggestion"
               >
-                <title>thumb-down</title>
-                <path d="M19,15H23V3H19M15,3H6C5.17,3 4.46,3.5 4.16,4.22L1.14,11.27C1.05,11.5 1,11.74 1,12V14A2,2 0 0,0 3,16H9.31L8.36,20.57C8.34,20.67 8.33,20.77 8.33,20.88C8.33,21.3 8.5,21.67 8.77,21.94L9.83,23L16.41,16.41C16.78,16.05 17,15.55 17,15V5C17,3.89 16.1,3 15,3Z" />
-              </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  className="w-5 h-5"
+                >
+                  <title>thumb-down</title>
+                  <path d="M19,15H23V3H19M15,3H6C5.17,3 4.46,3.5 4.16,4.22L1.14,11.27C1.05,11.5 1,11.74 1,12V14A2,2 0 0,0 3,16H9.31L8.36,20.57C8.34,20.67 8.33,20.77 8.33,20.88C8.33,21.3 8.5,21.67 8.77,21.94L9.83,23L16.41,16.41C16.78,16.05 17,15.55 17,15V5C17,3.89 16.1,3 15,3Z" />
+                </svg>
+              </button>
+            </div>
+
+
+            <button className="bg-purple-600 self-end text-white px-2 py-1 rounded-md hover:bg-purple-700 text-sm transition">
+              Overnemen
             </button>
           </div>
+
+
         </div>
       </div>
 
@@ -122,7 +134,7 @@ const AISuggestionPopup = ({
                 navigator.clipboard.writeText(prompt);
                 alert("Prompt gekopieerd naar klembord!");
               }}
-              className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition"
+              className="bg-purple-600 text-white px-2 py-1 text-sm rounded-md hover:bg-purple-700 transition"
             >
               Kopieer prompt
             </button>
@@ -144,7 +156,6 @@ const ScoringSystem = () => {
   const [hideScored, setHideScored] = useState(false); // Default uit
   const [animatingItems, setAnimatingItems] = useState({});
   const [visibleAIScores, setVisibleAIScores] = useState({}); // Voor individuele AI-scores
-
   // Ref voor scrolling
   const rightColumnRef = useRef(null);
 
@@ -525,7 +536,9 @@ const ScoringSystem = () => {
                       {group.title}
 
                       <div>
-                        <Tooltip open={groupIndex == 1 ? true : false}>
+                        <Tooltip
+                          defaultOpen={groupIndex == 1 ? true : false}
+                        >
                           <TooltipTrigger asChild>
                             <div
                               className="flex gap-2 mt-2"
@@ -559,7 +572,7 @@ const ScoringSystem = () => {
                       </div>
                     </div>
 
-                    {filteredAnswers.map((answer) => (
+                    {filteredAnswers.map((answer, index) => (
                       <div
                         key={answer.id}
                         className={`px-4 py-3 border-t border-gray-100 flex items-center bg-white `}
@@ -654,8 +667,8 @@ const ScoringSystem = () => {
 
                             {answer.confidence > 10 ? (
 
-                              <Tooltip>
-                                <Popover>
+                              <Tooltip defaultOpen={(groupIndex == 1 || groupIndex == 0) && index == 0 ? true : false}>
+                                <Popover >
                                   <TooltipTrigger asChild>
                                     <PopoverTrigger asChild >
                                       <button
@@ -674,21 +687,6 @@ const ScoringSystem = () => {
                                           {answer.aiScore}
                                         </span>
                                       </button>
-
-
-                                      {/* </TooltipTrigger>
-                                    <TooltipContent>
-                                      {!scores[answer.id] === answer.aiScore ||
-                                        showAISuggestions ||
-                                        visibleAIScores[answer.id]
-                                        ? "Toon AI redenering achter score"
-                                        : "Toon AI score"}
-                         
-                                    </TooltipContent>
-                                  </Tooltip> */}
-
-
-
                                     </PopoverTrigger>
                                   </TooltipTrigger>
 
@@ -713,7 +711,10 @@ const ScoringSystem = () => {
                                         visibleAIScores[answer.id]
                                         ? "Toon AI redenering achter score"
                                         : "Toon AI score"}
-
+                                      <TooltipArrow
+                                        fill="#ffffff"
+                                        className="TooltipArrow border-white"
+                                      />
                                     </TooltipContent>
                                   </TooltipPortal>
                                 </Popover>
