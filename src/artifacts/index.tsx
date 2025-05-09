@@ -13,7 +13,7 @@ import {
   PopoverContent,
 } from "../components/ui/popover";
 import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
-import { TooltipArrow } from "@radix-ui/react-tooltip";
+import { TooltipArrow, TooltipPortal } from "@radix-ui/react-tooltip";
 
 const AISuggestionPopup = ({
   question,
@@ -654,38 +654,29 @@ const ScoringSystem = () => {
 
                             {answer.confidence > 10 ? (
 
-
-                              <Popover>
-                                <PopoverTrigger asChild >
-
-                                  {/* <Tooltip
-                                    open={
-                                      answer.text ==
-                                        "leeft vooral in de buurt van bossen en heggen"
-                                        ? true
-                                        : false
-                                    }
-                                  >
-                                    <TooltipTrigger asChild> */}
-                                  <button
-                                    onClick={() => togglePopup(answer.id)}
-                                    className={`ml-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors border bg-purple-100 text-purple-800 border-purple-300`}
-                                    title="AI-suggestie (klik voor details)"
-                                  >
-                                    <span
-                                      className={`${scores[answer.id] === answer.aiScore ||
-                                        showAISuggestions ||
-                                        visibleAIScores[answer.id]
-                                        ? ""
-                                        : "blur-sm"
-                                        }`}
-                                    >
-                                      {answer.aiScore}
-                                    </span>
-                                  </button>
+                              <Tooltip>
+                                <Popover>
+                                  <TooltipTrigger asChild>
+                                    <PopoverTrigger asChild >
+                                      <button
+                                        onClick={() => togglePopup(answer.id)}
+                                        className={`ml-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors border bg-purple-100 text-purple-800 border-purple-300`}
+                                        title="AI-suggestie (klik voor details)"
+                                      >
+                                        <span
+                                          className={`${scores[answer.id] === answer.aiScore ||
+                                            showAISuggestions ||
+                                            visibleAIScores[answer.id]
+                                            ? ""
+                                            : "blur-sm"
+                                            }`}
+                                        >
+                                          {answer.aiScore}
+                                        </span>
+                                      </button>
 
 
-                                  {/* </TooltipTrigger>
+                                      {/* </TooltipTrigger>
                                     <TooltipContent>
                                       {!scores[answer.id] === answer.aiScore ||
                                         showAISuggestions ||
@@ -698,21 +689,35 @@ const ScoringSystem = () => {
 
 
 
-                                </PopoverTrigger>
-                                <PopoverContent side="left" align="start">
-                                  {/* AI-suggestie popup */}
-                                  <AISuggestionPopup
-                                    question={question}
-                                    answer={answer}
-                                    getAIExplanation={getAIExplanation}
-                                    highlightWaterWord={highlightWaterWord}
-                                  />
-                                                             <PopoverArrow
-                              fill="#ffffff"
-                              className="TooltipArrow border-white"
-                            />
-                                </PopoverContent>
-                              </Popover>
+                                    </PopoverTrigger>
+                                  </TooltipTrigger>
+
+                                  <PopoverContent side="left" align="start">
+                                    {/* AI-suggestie popup */}
+                                    <AISuggestionPopup
+                                      question={question}
+                                      answer={answer}
+                                      getAIExplanation={getAIExplanation}
+                                      highlightWaterWord={highlightWaterWord}
+                                    />
+                                    <PopoverArrow
+                                      fill="#ffffff"
+                                      className="TooltipArrow border-white"
+                                    />
+                                  </PopoverContent>
+
+                                  <TooltipPortal>
+                                    <TooltipContent>
+                                      {!scores[answer.id] === answer.aiScore ||
+                                        showAISuggestions ||
+                                        visibleAIScores[answer.id]
+                                        ? "Toon AI redenering achter score"
+                                        : "Toon AI score"}
+
+                                    </TooltipContent>
+                                  </TooltipPortal>
+                                </Popover>
+                              </Tooltip>
 
 
                             ) : (
