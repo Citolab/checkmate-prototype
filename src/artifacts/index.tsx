@@ -86,32 +86,38 @@ const AISuggestionPopup = ({
 
 
 
+            <PopoverClose>
 
-            <button
-              onClick={() =>
-                handleScoreChange(answer.id, answer.aiScore)
-              }
-              disabled={
-                (
-                  !visibleAIScores[answer.id]) ||
-                scores[answer.id] === answer.aiScore
-              }
-              className={` px-2 py-1 rounded-md  self-end text-sm transition
+              <button
+                onClick={() =>
+                  handleScoreChange(answer.id, answer.aiScore)
+                }
+                disabled={
+                  (
+                    !visibleAIScores[answer.id]) ||
+                  scores[answer.id] === answer.aiScore
+                }
+                className={` px-2 py-1 rounded-md  self-end text-sm transition
                               ${answer.confidence <= 10 ? `invisible` : ""}    
                               ${scores[answer.id] === answer.aiScore ||
-                  (
-                    !visibleAIScores[answer.id])
-                  ? "bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed"
-                  : "bg-purple-600  text-white hover:bg-purple-700"
-                }`}
-              title={
-                scores[answer.id] === answer.aiScore
-                  ? "Score is al gelijk aan AI-suggestie"
-                  : "Overnemen van AI-suggestie"
-              }
-            >
-              Overnemen
-            </button>
+                    (
+                      !visibleAIScores[answer.id])
+                    ? "bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed"
+                    : "bg-purple-600  text-white hover:bg-purple-700"
+                  }`}
+                title={
+                  scores[answer.id] === answer.aiScore
+                    ? "Score is al gelijk aan AI-suggestie"
+                    : "Overnemen van AI-suggestie"
+                }
+              >
+                {scores[answer.id] === answer.aiScore
+                  ? "al overgenomen"
+                  : "overnemen"}
+              </button>
+
+            </PopoverClose>
+
           </div>
 
 
@@ -507,28 +513,7 @@ const ScoringSystem = () => {
                   </button>
                 </div>
 
-                {/* Add a button to apply all AI-suggested scores */}
-                {showAISuggestions && (
-                  <button
-                    onClick={() => {
-                      const newScores = {};
-                      answerGroups.forEach((group) => {
-                        group.answers.forEach((answer) => {
-                          if (answer.aiScore !== undefined) {
-                            newScores[answer.id] = answer.aiScore;
-                          }
-                        });
-                      });
-                      setScores((prevScores) => ({
-                        ...prevScores,
-                        ...newScores,
-                      }));
-                    }}
-                    className="bg-purple-100 text-purple-800 border border-purple-300 px-2 py-1 rounded-lg text-xs "
-                  >
-                    Pas alle AI-suggesties toe
-                  </button>
-                )}
+
 
                 {/* Toggle voor AI suggesties */}
                 <div className="flex items-center justify-end gap-2">
@@ -536,7 +521,7 @@ const ScoringSystem = () => {
                   verbergen
                   <button
                     onClick={() => setShowAISuggestions(!showAISuggestions)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${showAISuggestions ? "bg-blue-600" : "bg-gray-300"
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${showAISuggestions ? "bg-purple-600" : "bg-gray-300"
                       }`}
                   >
                     <span
@@ -547,6 +532,31 @@ const ScoringSystem = () => {
                   tonen
                 </div>
               </div>
+
+              {/* Add a button to apply all AI-suggested scores */}
+
+              <button
+                onClick={() => {
+                  const newScores = {};
+                  answerGroups.forEach((group) => {
+                    group.answers.forEach((answer) => {
+                      if (answer.aiScore !== undefined) {
+                        newScores[answer.id] = answer.aiScore;
+                      }
+                    });
+                  });
+                  setScores((prevScores) => ({
+                    ...prevScores,
+                    ...newScores,
+                  }));
+                }}
+                className={`bg-purple-800 text-purple-50 border border-purple-300 px-4 py-2 rounded-lg text-sm float-right
+                      ${showAISuggestions ? "visible" : "invisible"}
+                      `}
+              >
+                Pas alle AI-suggesties toe
+              </button>
+
 
               {answerGroups.map((group, groupIndex) => {
                 const filteredAnswers = getFilteredAnswers(group);
@@ -717,7 +727,7 @@ const ScoringSystem = () => {
                                     </PopoverTrigger>
                                   </TooltipTrigger>
 
-                                  <PopoverContent side="left" align="start" alignOffset={-54} className="w-80">
+                                  <PopoverContent side="left" align="start" alignOffset={-54} sideOffset={200} className="w-80">
                                     {/* AI-suggestie popup */}
                                     <AISuggestionPopup
                                       question={question}
@@ -736,7 +746,7 @@ const ScoringSystem = () => {
 
                                   <TooltipPortal>
                                     <TooltipContent>
-                                      {!scores[answer.id] === answer.aiScore ||
+                                      {scores[answer.id] === answer.aiScore ||
                                         showAISuggestions ||
                                         visibleAIScores[answer.id]
                                         ? "Toon AI redenering achter score"
