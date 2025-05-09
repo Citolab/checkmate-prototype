@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import jsonData from "./data.json";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "../components/ui/tooltip";
+import { TooltipArrow } from '@radix-ui/react-tooltip';
 
 const AISuggestionPopup = ({ question, answer, activePopup, setActivePopup, getAIExplanation, highlightWaterWord }) => {
   if (activePopup !== answer.id) return null;
@@ -462,17 +463,29 @@ const ScoringSystem = () => {
                   <div key={groupIndex} className="border-b last:border-b-0 mt-12">
                     <div className="px-4 py-2 font-medium text-xs uppercase text-gray-700 sticky z-10">
                       {group.title}
-                      <div className="flex gap-2 mt-2">
-                        {[0, 1, 2].map(score => (
-                          <button
-                            key={score}
-                            onClick={() => handleGroupScoreChange(groupIndex, score)}
-                            className="w-8 h-8 rounded-full border-2 flex items-center justify-center border-gray-400 text-gray-600"
-                          >
-                            {score}
-                          </button>
-                        ))}
+
+                      <div>
+                        <Tooltip open={ groupIndex == 1 ? true : false}>
+                          <TooltipTrigger asChild>
+                            <div className="flex gap-2 mt-2" style={{ width: 'fit-content' }}>
+                              {[0, 1, 2].map(score => (
+                                <button
+                                  key={score}
+                                  onClick={() => handleGroupScoreChange(groupIndex, score)}
+                                  className="w-8 h-8 rounded-full border-2 flex items-center justify-center border-gray-400 text-gray-600"
+                                >
+                                  {score}
+                                </button>
+                              ))}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className='normal-case' side="right" align="start">
+                            Scoor de groep
+                            <TooltipArrow fill='#ffffff' className="TooltipArrow border-white" />
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
+
                     </div>
 
                     {filteredAnswers.map((answer) => (
@@ -512,24 +525,24 @@ const ScoringSystem = () => {
                           {/* AI-suggestie or vraagteken knop */}
                           <div className="flex items-center justify-center" style={{ width: '80px' }}>
                             {/* Pijl om AI-suggestie over te nemen (altijd zichtbaar maar mogelijk disabled) */}
-                              <button
-                                onClick={() => handleScoreChange(answer.id, answer.aiScore)}
-                                disabled={!showAISuggestions && !visibleAIScores[answer.id] || scores[answer.id] === answer.aiScore}
-                                className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors
+                            <button
+                              onClick={() => handleScoreChange(answer.id, answer.aiScore)}
+                              disabled={!showAISuggestions && !visibleAIScores[answer.id] || scores[answer.id] === answer.aiScore}
+                              className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors
                               ${answer.confidence <= 10 ? `invisible` : ''}    
                               ${scores[answer.id] === answer.aiScore || (!showAISuggestions && !visibleAIScores[answer.id]) ?
-                                    'bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed invisible' :
-                                    'bg-blue-100 hover:bg-blue-200 text-blue-600 border border-blue-300'}`}
-                                title={scores[answer.id] === answer.aiScore ? "Score is al gelijk aan AI-suggestie" : "Overnemen van AI-suggestie"}
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
-                                </svg>
-                              </button>
+                                  'bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed invisible' :
+                                  'bg-blue-100 hover:bg-blue-200 text-blue-600 border border-blue-300'}`}
+                              title={scores[answer.id] === answer.aiScore ? "Score is al gelijk aan AI-suggestie" : "Overnemen van AI-suggestie"}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                              </svg>
+                            </button>
 
 
                             {answer.confidence > 10 ? (
-                              <Tooltip>
+                              <Tooltip open={answer.text=='leeft vooral in de buurt van bossen en heggen' ?  true : false}>
                                 <TooltipTrigger asChild>
                                   <button
                                     onClick={() => togglePopup(answer.id)}
@@ -543,6 +556,7 @@ const ScoringSystem = () => {
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   {!scores[answer.id] === answer.aiScore || showAISuggestions || visibleAIScores[answer.id] ? 'Toon AI redenering achter score' : 'Toon AI score'}
+                                  <TooltipArrow fill='#ffffff' className="TooltipArrow border-white" />
                                 </TooltipContent>
                               </Tooltip>
                             ) : (
