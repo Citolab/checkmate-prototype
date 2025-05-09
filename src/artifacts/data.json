@@ -85,7 +85,7 @@
         "answers": [
             { "id": 7, "text": "nestgelegenheden", "aiScore": 0, "confidence": 4 },
             { "id": 8, "text": "de temperatuur", "aiScore": 1, "confidence": 82 },
-            { "id": 9, "text": "andere dieren die de eitjes op eten", "aiScore": 0, "confidence": 75 },
+            { "id": 9, "text": "andere dieren die de eitjes op eten", "aiScore": 0, "confidence": 9 },
             { "id": 10, "text": "watervlooien", "aiScore": 0, "confidence": 78 },
             { "id": 11, "text": "omgeving (bossen, heggen en water in de buurt)", "aiScore": 1, "confidence": 85 },
             { "id": 12, "text": "bosgroei", "aiScore": 0, "confidence": 4 },

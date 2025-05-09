@@ -78,8 +78,8 @@ const AISuggestionPopup = ({ question, answer, activePopup, setActivePopup, getA
 
         <div>
           <h4 className="font-medium text-gray-700 mb-2">Generative AI feedback:</h4>
-          <div className="text-sm text-gray-700 bg-purple-50 p-3 rounded-md border border-purple-100">
-            {getAIExplanation(answer.id)?.explanation}
+          <div className="text-sm text-gray-700 bg-purple-50 p-3 rounded-md border border-purple-100 flex justify-center">
+            {/* {getAIExplanation(answer.id)?.explanation} */}
             <button
               onClick={() => {
                 const prompt = `Vraag: ${question.title} ${question.text}\nAntwoordmodel: ${question.correctAnswer}\nAntwoord van leerling: ${answer.text}\nMaximale score: 2\n\nMet deze vraag, dit antwoordmodel en deze maximale score, wat zou jij de leerling als score geven?`;
@@ -91,6 +91,7 @@ const AISuggestionPopup = ({ question, answer, activePopup, setActivePopup, getA
               Kopieer prompt
             </button>
           </div>
+          <p className="mt-2 text-sm text-gray-400">gebruik de prompt om zelf in je chatgpt te kijken hoeveel punten die geeft</p>
         </div>
       </div>
     </div>
@@ -322,6 +323,9 @@ const ScoringSystem = () => {
               {index + 1}
             </div>
           ))}
+          <div className="w-6 h-6 rounded-full mx-1 flex items-center justify-center bg-white">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className='w-8 h-8 fill-blue-600'><title>chevron-right</title><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" /></svg>
+          </div>
         </div>
 
         <div className="bg-gray-100 p-4 rounded-lg shadow-sm mb-4">
