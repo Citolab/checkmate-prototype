@@ -20,6 +20,9 @@ const AISuggestionPopup = ({
   answer,
   getAIExplanation,
   highlightWaterWord,
+  handleScoreChange,
+  visibleAIScores,
+  scores
 }) => {
 
 
@@ -38,7 +41,7 @@ const AISuggestionPopup = ({
             <span className="text-sm font-medium text-gray-600">
               Voorgestelde score:
             </span>
-            <span className="ml-2 w-6 h-6 bg-purple-100 border border-purple-300 rounded-full inline-flex items-center justify-center font-bold text-sm text-purple-800">
+            <span className="ml-2 w-8 h-8 bg-purple-100 border border-purple-300 rounded-full inline-flex items-center justify-center font-bold text-sm text-purple-800">
               {answer.aiScore}
             </span>
 
@@ -82,7 +85,31 @@ const AISuggestionPopup = ({
             </div>
 
 
-            <button className="bg-purple-600 self-end text-white px-2 py-1 rounded-md hover:bg-purple-700 text-sm transition">
+
+
+            <button
+              onClick={() =>
+                handleScoreChange(answer.id, answer.aiScore)
+              }
+              disabled={
+                (
+                  !visibleAIScores[answer.id]) ||
+                scores[answer.id] === answer.aiScore
+              }
+              className={` px-2 py-1 rounded-md  self-end text-sm transition
+                              ${answer.confidence <= 10 ? `invisible` : ""}    
+                              ${scores[answer.id] === answer.aiScore ||
+                  (
+                    !visibleAIScores[answer.id])
+                  ? "bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed"
+                  : "bg-purple-600  text-white hover:bg-purple-700"
+                }`}
+              title={
+                scores[answer.id] === answer.aiScore
+                  ? "Score is al gelijk aan AI-suggestie"
+                  : "Overnemen van AI-suggestie"
+              }
+            >
               Overnemen
             </button>
           </div>
@@ -690,13 +717,16 @@ const ScoringSystem = () => {
                                     </PopoverTrigger>
                                   </TooltipTrigger>
 
-                                  <PopoverContent side="left" align="start">
+                                  <PopoverContent side="left" align="start" alignOffset={-54} className="w-80">
                                     {/* AI-suggestie popup */}
                                     <AISuggestionPopup
                                       question={question}
                                       answer={answer}
                                       getAIExplanation={getAIExplanation}
                                       highlightWaterWord={highlightWaterWord}
+                                      handleScoreChange={handleScoreChange}
+                                      visibleAIScores={visibleAIScores}
+                                      scores={scores}
                                     />
                                     <PopoverArrow
                                       fill="#ffffff"
