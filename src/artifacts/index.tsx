@@ -32,7 +32,22 @@ const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanati
             <span className="text-sm text-purple-600 ml-2">{getAIExplanation(answer.id)?.confidence || 0}% zeker</span>
           </div>
 
-          
+          {/* Thumbs up and down for feedback using SVG icons */}
+          <div className="flex items-center mt-2 space-x-2">
+            <button
+              className="w-8 h-8 fill-green-600 rounded-full flex items-center justify-center text-sm font-semibold transition-colors bg-green-100 text-green-600 border border-green-300"
+              title="Thumbs up - Agree with AI suggestion"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className='w-5 h-5'><title>thumb-up</title><path d="M23,10C23,8.89 22.1,8 21,8H14.68L15.64,3.43C15.66,3.33 15.67,3.22 15.67,3.11C15.67,2.7 15.5,2.32 15.23,2.05L14.17,1L7.59,7.58C7.22,7.95 7,8.45 7,9V19A2,2 0 0,0 9,21H18C18.83,21 19.54,20.5 19.84,19.78L22.86,12.73C22.95,12.5 23,12.26 23,12V10M1,21H5V9H1V21Z" /></svg>
+            </button>
+            <button
+              className="w-8 h-8 fill-red-600 rounded-full flex items-center justify-center text-sm font-semibold transition-colors bg-red-100 text-red-600 border border-red-300"
+              title="Thumbs down - Disagree with AI suggestion"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className='w-5 h-5'><title>thumb-down</title><path d="M19,15H23V3H19M15,3H6C5.17,3 4.46,3.5 4.16,4.22L1.14,11.27C1.05,11.5 1,11.74 1,12V14A2,2 0 0,0 3,16H9.31L8.36,20.57C8.34,20.67 8.33,20.77 8.33,20.88C8.33,21.3 8.5,21.67 8.77,21.94L9.83,23L16.41,16.41C16.78,16.05 17,15.55 17,15V5C17,3.89 16.1,3 15,3Z" /></svg>
+            </button>
+          </div>
+
         </div>
       </div>
 
@@ -298,7 +313,7 @@ const ScoringSystem = () => {
             </div>
           ))}
         </div>
-        
+
         <div className="bg-gray-100 p-4 rounded-lg shadow-sm mb-4">
           <div className="flex justify-between items-center mb-2">
             <div className="text-sm font-medium text-gray-700">Voortgang beoordeling</div>
@@ -399,6 +414,8 @@ const ScoringSystem = () => {
               {/* Toggle voor AI suggesties */}
               <div className="flex items-center justify-end gap-2">
                 <span className="text-sm text-gray-600">AI-suggesties</span>
+
+                verbergen
                 <button
                   onClick={() => setShowAISuggestions(!showAISuggestions)}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${showAISuggestions ? 'bg-blue-600' : 'bg-gray-300'}`}
@@ -407,6 +424,7 @@ const ScoringSystem = () => {
                     className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${showAISuggestions ? 'translate-x-6' : 'translate-x-1'}`}
                   />
                 </button>
+                tonen
               </div>
 
 
@@ -491,15 +509,15 @@ const ScoringSystem = () => {
 
                           {/* AI-score or vraagteken button */}
                           {answer.confidence > 10 ? (
-                          <button
-                            onClick={() => togglePopup(answer.id)}
-                            className={`ml-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors border bg-purple-100 text-purple-800 border-purple-300`}
-                            title="AI-suggestie (klik voor details)"
-                          >
-                            <span className={`${scores[answer.id] === answer.aiScore || showAISuggestions || visibleAIScores[answer.id] ? '' : 'blur-sm'}`}>
-                              {answer.aiScore}
-                            </span>
-                          </button>
+                            <button
+                              onClick={() => togglePopup(answer.id)}
+                              className={`ml-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors border bg-purple-100 text-purple-800 border-purple-300`}
+                              title="AI-suggestie (klik voor details)"
+                            >
+                              <span className={`${scores[answer.id] === answer.aiScore || showAISuggestions || visibleAIScores[answer.id] ? '' : 'blur-sm'}`}>
+                                {answer.aiScore}
+                              </span>
+                            </button>
                           ) : (
                             <button
                               // onClick={() => togglePopup(answer.id)}
