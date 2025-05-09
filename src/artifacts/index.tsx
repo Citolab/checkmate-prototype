@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import jsonData from "./data.json";
 
-const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanation, highlightWaterWord }) => {
+const AISuggestionPopup = ({ question, answer, activePopup, setActivePopup, getAIExplanation, highlightWaterWord }) => {
   if (activePopup !== answer.id) return null;
 
   return (
@@ -77,9 +77,19 @@ const AISuggestionPopup = ({ answer, activePopup, setActivePopup, getAIExplanati
         </div>
 
         <div>
-          <h4 className="font-medium text-gray-700 mb-2">AI feedback:</h4>
+          <h4 className="font-medium text-gray-700 mb-2">Generative AI feedback:</h4>
           <div className="text-sm text-gray-700 bg-purple-50 p-3 rounded-md border border-purple-100">
             {getAIExplanation(answer.id)?.explanation}
+            <button
+              onClick={() => {
+                const prompt = `Vraag: ${question.title} ${question.text}\nAntwoordmodel: ${question.correctAnswer}\nAntwoord van leerling: ${answer.text}\nMaximale score: 2\n\nMet deze vraag, dit antwoordmodel en deze maximale score, wat zou jij de leerling als score geven?`;
+                navigator.clipboard.writeText(prompt);
+                alert("Prompt gekopieerd naar klembord!");
+              }}
+              className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition"
+            >
+              Kopieer prompt
+            </button>
           </div>
         </div>
       </div>
@@ -532,6 +542,7 @@ const ScoringSystem = () => {
 
                       {/* AI-suggestie popup */}
                       <AISuggestionPopup
+                        question={question}
                         answer={answer}
                         activePopup={activePopup}
                         setActivePopup={setActivePopup}
