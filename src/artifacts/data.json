@@ -67,15 +67,15 @@
     {
         "title": "Automatisch gescoorde antwoorden",
         "answers": [
-            { "id": 1, "text": "water", "aiScore": 2, "confidence": 98 },
-            { "id": 2, "text": "Water.", "aiScore": 2, "confidence": 97 }
+            { "id": 1, "text": "water", "aiScore": 2, "confidence": 98, "names": ["Jan de Vries", "Piet Jansen", "Klaas Bakker", "Henk Visser", "Anna de Boer"] },
+            { "id": 2, "text": "Water.", "aiScore": 2, "confidence": 97, "names": ["Jan de Vries", "Piet Jansen", "Klaas Bakker", "Henk Visser", "Anna de Boer"] }
         ]
     },
     {
         "title": "Bossen en heggen",
         "answers": [
-            { "id": 3, "text": "leeft vooral in de buurt van bossen en heggen", "aiScore": 0, "confidence": 94 },
-            { "id": 4, "text": "Hij leeft vooral in de buurt van bossen en heggen.", "aiScore": 0, "confidence": 93 },
+            { "id": 3, "text": "leeft vooral in de buurt van bossen en heggen", "aiScore": 0, "confidence": 94, "names": ["Sophie van Dijk", "Emma de Jong"] },
+            { "id": 4, "text": "Hij leeft vooral in de buurt van bossen en heggen.", "aiScore": 0, "confidence": 93, "names": ["Sophie van Dijk", "Emma de Jong"] },
             { "id": 5, "text": "bossen en heggen", "aiScore": 0, "confidence": 92 },
             { "id": 6, "text": "leven in buurt van bossen en heggen", "aiScore": 0, "confidence": 91 }
         ]

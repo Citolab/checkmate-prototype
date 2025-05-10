@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import jsonData from "./data.json";
 import {
   Tooltip,
@@ -14,6 +14,25 @@ import {
 } from "../components/ui/popover";
 import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
 import { TooltipArrow, TooltipPortal } from "@radix-ui/react-tooltip";
+import { UserIcon } from "@heroicons/react/solid";
+
+const CandidatePopover = ({ names = [] }) => (
+  <Popover>
+    <PopoverTrigger asChild>
+      <button className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+        <UserIcon className="w-5 h-5 text-gray-600" />
+      </button>
+    </PopoverTrigger>
+    <PopoverContent className="p-4 bg-white rounded shadow-md">
+      <h4 className="font-bold text-gray-700 mb-2">Kandidaten</h4>
+      <ul className="text-sm text-gray-600">
+        {names.map((name, index) => (
+          <li key={index}>{name}</li>
+        ))}
+      </ul>
+    </PopoverContent>
+  </Popover>
+);
 
 const AISuggestionPopup = ({
   question,
@@ -86,10 +105,7 @@ const AISuggestionPopup = ({
 
 
 
-            <PopoverClose>
-
-              <button
-                onClick={() =>
+            <PopoverClose onClick={() =>
                   handleScoreChange(answer.id, answer.aiScore)
                 }
                 disabled={
@@ -109,12 +125,13 @@ const AISuggestionPopup = ({
                   scores[answer.id] === answer.aiScore
                     ? "Score is al gelijk aan AI-suggestie"
                     : "Overnemen van AI-suggestie"
-                }
-              >
+                }>
+
+      
                 {scores[answer.id] === answer.aiScore
                   ? "al overgenomen"
                   : "overnemen"}
-              </button>
+      
 
             </PopoverClose>
 
@@ -777,11 +794,11 @@ const ScoringSystem = () => {
                             )}
                           </div>
                         </div>
-
-
+                        <CandidatePopover names={answer.names} />
                       </div>
                     ))}
                   </div>
+
                 );
               })}
             </div>
