@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import jsonData from "./data.json";
+type JsonData = typeof jsonData;
 import {
   Tooltip,
   TooltipTrigger,
@@ -106,32 +107,32 @@ const AISuggestionPopup = ({
 
 
             <PopoverClose onClick={() =>
-                  handleScoreChange(answer.id, answer.aiScore)
-                }
-                disabled={
-                  (
-                    !visibleAIScores[answer.id]) ||
-                  scores[answer.id] === answer.aiScore
-                }
-                className={` px-2 py-1 rounded-md  self-end text-sm transition
+              handleScoreChange(answer.id, answer.aiScore)
+            }
+              disabled={
+                (
+                  !visibleAIScores[answer.id]) ||
+                scores[answer.id] === answer.aiScore
+              }
+              className={` px-2 py-1 rounded-md  self-end text-sm transition
                               ${answer.confidence <= 10 ? `invisible` : ""}    
                               ${scores[answer.id] === answer.aiScore ||
-                    (
-                      !visibleAIScores[answer.id])
-                    ? "bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed"
-                    : "bg-purple-600  text-white hover:bg-purple-700"
-                  }`}
-                title={
-                  scores[answer.id] === answer.aiScore
-                    ? "Score is al gelijk aan AI-suggestie"
-                    : "Overnemen van AI-suggestie"
-                }>
+                  (
+                    !visibleAIScores[answer.id])
+                  ? "bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed"
+                  : "bg-purple-600  text-white hover:bg-purple-700"
+                }`}
+              title={
+                scores[answer.id] === answer.aiScore
+                  ? "Score is al gelijk aan AI-suggestie"
+                  : "Overnemen van AI-suggestie"
+              }>
 
-      
-                {scores[answer.id] === answer.aiScore
-                  ? "al overgenomen"
-                  : "overnemen"}
-      
+
+              {scores[answer.id] === answer.aiScore
+                ? "al overgenomen"
+                : "overnemen"}
+
 
             </PopoverClose>
 
@@ -247,13 +248,23 @@ const ScoringSystem = () => {
     return { explanation, similarAnswers, confidence };
   };
 
+  function groupAnswersByTitle(answers: JsonData["answers"]) {
+    const grouped = Object.groupBy(answers, (answer) => answer.group);
+
+    return {
+      answerGroups: Object.entries(grouped).map(([title, answers]) => ({
+        title,
+        answers: answers.map(({ group: _group, ...rest }) => rest)
+      }))
+    };
+  }
   // Antwoorden gegroepeerd
-  const answerGroups = jsonData.answerGroups;
+  const answerGroups = groupAnswersByTitle(jsonData.answers).answerGroups;
 
   // Effect om automatisch correcte antwoorden in te vullen bij eerste render
   useEffect(() => {
     // Haal alle antwoorden uit de "Correcte antwoorden" groep
-    const correctGroup = jsonData.answerGroups.find(
+    const correctGroup = answerGroups.find(
       (group) => group.title === "Automatisch gescoorde antwoorden"
     );
     if (correctGroup) {
