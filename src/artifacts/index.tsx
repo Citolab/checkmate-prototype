@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import jsonData from "./data.json";
+import "./index.css";
 type JsonData = typeof jsonData;
 import {
   Tooltip,
@@ -13,39 +14,28 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "../components/ui/popover";
+// import {
+//   Accordion,
+//   AccordionItem,
+//   AccordionTrigger,
+//   AccordionContent,
+// } from "../components/ui/accordion";
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "../components/ui/collapsible";
 import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
 import { TooltipArrow, TooltipPortal } from "@radix-ui/react-tooltip";
-import { UserIcon } from "@heroicons/react/solid";
-
-const CandidatePopover = ({ names = [] }) => (
-  <Popover>
-    <PopoverTrigger asChild>
-      <button className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-        <UserIcon className="w-5 h-5 text-gray-600" />
-      </button>
-    </PopoverTrigger>
-    <PopoverContent className="p-4 bg-white rounded shadow-md">
-      <h4 className="font-bold text-gray-700 mb-2">Kandidaten</h4>
-      <ul className="text-sm text-gray-600">
-        {names.map((name, index) => (
-          <li key={index}>{name}</li>
-        ))}
-      </ul>
-    </PopoverContent>
-  </Popover>
-);
 
 const AISuggestionPopup = ({
   question,
   answer,
-  getAIExplanation,
   highlightWaterWord,
   handleScoreChange,
   visibleAIScores,
-  scores
+  scores,
 }) => {
-
-
   return (
     <>
       <div className="flex justify-between items-start mb-3">
@@ -65,16 +55,13 @@ const AISuggestionPopup = ({
               {answer.aiScore}
             </span>
 
-
-
             <span className="text-sm text-purple-600 ml-2">
-              {getAIExplanation(answer.id)?.confidence || 0}% zeker
+              {answer.confidence || 0}% zeker
             </span>
           </div>
 
           {/* Thumbs up and down for feedback using SVG icons */}
           <div className="flex items-center justify-between space-x-2">
-
             <div className="flex items-center mt-2 space-x-2">
               <button
                 className="w-8 h-8 fill-green-600 rounded-full flex items-center justify-center text-sm font-semibold transition-colors bg-green-100 text-green-600 border border-green-300"
@@ -104,41 +91,31 @@ const AISuggestionPopup = ({
               </button>
             </div>
 
-
-
-            <PopoverClose onClick={() =>
-              handleScoreChange(answer.id, answer.aiScore)
-            }
+            <PopoverClose
+              onClick={() => handleScoreChange(answer.id, answer.aiScore)}
               disabled={
-                (
-                  !visibleAIScores[answer.id]) ||
+                !visibleAIScores[answer.id] ||
                 scores[answer.id] === answer.aiScore
               }
               className={` px-2 py-1 rounded-md  self-end text-sm transition
                               ${answer.confidence <= 10 ? `invisible` : ""}    
-                              ${scores[answer.id] === answer.aiScore ||
-                  (
-                    !visibleAIScores[answer.id])
-                  ? "bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed"
-                  : "bg-purple-600  text-white hover:bg-purple-700"
-                }`}
+                              ${
+                                scores[answer.id] === answer.aiScore ||
+                                !visibleAIScores[answer.id]
+                                  ? "bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed"
+                                  : "bg-purple-600  text-white hover:bg-purple-700"
+                              }`}
               title={
                 scores[answer.id] === answer.aiScore
                   ? "Score is al gelijk aan AI-suggestie"
                   : "Overnemen van AI-suggestie"
-              }>
-
-
+              }
+            >
               {scores[answer.id] === answer.aiScore
                 ? "al overgenomen"
                 : "overnemen"}
-
-
             </PopoverClose>
-
           </div>
-
-
         </div>
       </div>
 
@@ -155,20 +132,18 @@ const AISuggestionPopup = ({
               </tr>
             </thead>
             <tbody>
-              {getAIExplanation(answer.id)?.similarAnswers.map(
-                (similar, idx) => (
-                  <tr key={idx} className="border-t border-gray-100">
-                    <td className="py-2 px-2 text-gray-800">
-                      {highlightWaterWord(similar.text)}
-                    </td>
-                    <td className="py-2 text-center">
-                      <span className="w-6 h-6 bg-gray-100 border rounded-full inline-flex items-center justify-center text-xs font-medium text-gray-800">
-                        {similar.score}
-                      </span>
-                    </td>
-                  </tr>
-                )
-              )}
+              {answer.similarAnswers.map((similar, idx) => (
+                <tr key={idx} className="border-t border-gray-100">
+                  <td className="py-2 px-2 text-gray-800">
+                    {highlightWaterWord(similar.text)}
+                  </td>
+                  <td className="py-2 text-center">
+                    <span className="w-6 h-6 bg-gray-100 border rounded-full inline-flex items-center justify-center text-xs font-medium text-gray-800">
+                      {similar.score}
+                    </span>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -205,7 +180,6 @@ const ScoringSystem = () => {
   const [scores, setScores] = useState({});
   const [showAISuggestions, setShowAISuggestions] = useState(false); // Default uit
   const [hideScored, setHideScored] = useState(false); // Default uit
-  const [animatingItems, setAnimatingItems] = useState({});
   const [visibleAIScores, setVisibleAIScores] = useState({}); // Voor individuele AI-scores
   // Ref voor scrolling
   const rightColumnRef = useRef(null);
@@ -214,39 +188,39 @@ const ScoringSystem = () => {
   const question = jsonData.question;
 
   // AI-uitleg voor antwoorden
-  const aiExplanations = jsonData.aiExplanations;
+  // const aiExplanations = jsonData.aiExplanations;
 
   // Voor antwoorden zonder specifieke uitleg
-  const getDefaultExplanation = (answerId, score) => {
-    const answer = answerGroups
-      .flatMap((g) => g.answers)
-      .find((a) => a.id === answerId);
-    if (!answer) return null;
+  // const getDefaultExplanation = (answerId, score) => {
+  //   const answer = answerGroups
+  //     .flatMap((g) => g.answers)
+  //     .find((a) => a.id === answerId);
+  //   if (!answer) return null;
 
-    let explanation = "";
-    let similarAnswers = [];
-    let confidence = 0;
+  //   let explanation = "";
+  //   let similarAnswers = [];
+  //   let confidence = 0;
 
-    if (score === 0) {
-      explanation = `Het antwoord "${answer.text}" bevat geen correcte abiotische factor voor de kamsalamander. De tekst geeft aan dat water de belangrijke abiotische factor is, maar dit wordt niet genoemd in het antwoord.`;
-      similarAnswers = [
-        { text: "de larven eten watervlooien", score: 0, date: "20-03-2025" },
-        { text: "zeldzaamheid", score: 0, date: "17-02-2025" },
-        { text: "voedsel voor de larven", score: 0, date: "12-01-2025" },
-      ];
-      confidence = 78;
-    } else if (score === 1) {
-      explanation = `Het antwoord "${answer.text}" bevat elementen die deels correct zijn, maar mist precisie of bevat ook incorrecte elementen. De tekst identificeert water als de belangrijke abiotische factor.`;
-      similarAnswers = [
-        { text: "wateromgeving", score: 1, date: "05-04-2025" },
-        { text: "vochtige gebieden", score: 1, date: "19-02-2025" },
-        { text: "waterpoel of vijver", score: 1, date: "25-01-2025" },
-      ];
-      confidence = 75;
-    }
+  //   if (score === 0) {
+  //     explanation = `Het antwoord "${answer.text}" bevat geen correcte abiotische factor voor de kamsalamander. De tekst geeft aan dat water de belangrijke abiotische factor is, maar dit wordt niet genoemd in het antwoord.`;
+  //     similarAnswers = [
+  //       { text: "de larven eten watervlooien", score: 0, date: "20-03-2025" },
+  //       { text: "zeldzaamheid", score: 0, date: "17-02-2025" },
+  //       { text: "voedsel voor de larven", score: 0, date: "12-01-2025" },
+  //     ];
+  //     confidence = 78;
+  //   } else if (score === 1) {
+  //     explanation = `Het antwoord "${answer.text}" bevat elementen die deels correct zijn, maar mist precisie of bevat ook incorrecte elementen. De tekst identificeert water als de belangrijke abiotische factor.`;
+  //     similarAnswers = [
+  //       { text: "wateromgeving", score: 1, date: "05-04-2025" },
+  //       { text: "vochtige gebieden", score: 1, date: "19-02-2025" },
+  //       { text: "waterpoel of vijver", score: 1, date: "25-01-2025" },
+  //     ];
+  //     confidence = 75;
+  //   }
 
-    return { explanation, similarAnswers, confidence };
-  };
+  //   return { explanation, similarAnswers, confidence };
+  // };
 
   function groupAnswersByTitle(answers: JsonData["answers"]) {
     const grouped = Object.groupBy(answers, (answer) => answer.group);
@@ -254,8 +228,8 @@ const ScoringSystem = () => {
     return {
       answerGroups: Object.entries(grouped).map(([title, answers]) => ({
         title,
-        answers: answers.map(({ group: _group, ...rest }) => rest)
-      }))
+        answers: answers.map(({ group: _group, ...rest }) => rest),
+      })),
     };
   }
   // Antwoorden gegroepeerd
@@ -290,7 +264,6 @@ const ScoringSystem = () => {
     }
   }, []); // Removed jsonData.answerGroups from the dependency array
 
-
   // Safe utility function for hasOwnProperty
   const safeHasOwnProperty = (obj, prop) =>
     Object.prototype.hasOwnProperty.call(obj, prop);
@@ -310,18 +283,18 @@ const ScoringSystem = () => {
       });
 
       // Als we gescoorde items verbergen, voeg dit item toe aan animerende items
-      if (hideScored) {
-        setAnimatingItems((prev) => ({ ...prev, [answerId]: true }));
+      // if (hideScored) {
+      //   setAnimatingItems((prev) => ({ ...prev, [answerId]: true }));
 
-        // Verwijder het item uit animerende items na animatie
-        setTimeout(() => {
-          setAnimatingItems((prev) => {
-            const newAnimating = { ...prev };
-            delete newAnimating[answerId];
-            return newAnimating;
-          });
-        }, 500); // 500ms komt overeen met de transitieduur
-      }
+      //   // Verwijder het item uit animerende items na animatie
+      //   setTimeout(() => {
+      //     setAnimatingItems((prev) => {
+      //       const newAnimating = { ...prev };
+      //       delete newAnimating[answerId];
+      //       return newAnimating;
+      //     });
+      //   }, 500); // 500ms komt overeen met de transitieduur
+      // }
     }
   };
 
@@ -334,12 +307,12 @@ const ScoringSystem = () => {
         animating[id] = true;
       });
 
-      setAnimatingItems(animating);
+      // setAnimatingItems(animating);
 
       // Na de animatie de toggle updaten
       setTimeout(() => {
         setHideScored(true);
-        setAnimatingItems({});
+        // setAnimatingItems({});
       }, 500);
     } else {
       // Direct tonen bij uitschakelen
@@ -350,27 +323,27 @@ const ScoringSystem = () => {
   const togglePopup = (answerId) => {
     // Als AI-suggesties niet standaard zichtbaar zijn, maak deze specifieke zichtbaar
     if (!showAISuggestions) {
-      setVisibleAIScores(prev => ({
+      setVisibleAIScores((prev) => ({
         ...prev,
-        [answerId]: true
+        [answerId]: true,
       }));
     }
   };
 
-  // Antwoord opzoeken voor popup
-  const getAnswerById = (id) => {
-    return answerGroups.flatMap((g) => g.answers).find((a) => a.id === id);
-  };
+  // // Antwoord opzoeken voor popup
+  // const getAnswerById = (id) => {
+  //   return answerGroups.flatMap((g) => g.answers).find((a) => a.id === id);
+  // };
 
-  // AI-uitleg ophalen
-  const getAIExplanation = (answerId) => {
-    if (aiExplanations[answerId]) {
-      return aiExplanations[answerId];
-    } else {
-      const answer = getAnswerById(answerId);
-      return getDefaultExplanation(answerId, answer.aiScore);
-    }
-  };
+  // // AI-uitleg ophalen
+  // const getAIExplanation = (answerId) => {
+  //   if (aiExplanations[answerId]) {
+  //     return aiExplanations[answerId];
+  //   } else {
+  //     const answer = getAnswerById(answerId);
+  //     return getDefaultExplanation(answerId, answer.aiScore);
+  //   }
+  // };
 
   // Tekst markeren voor het woord 'water'
   const highlightWaterWord = (text) => {
@@ -399,7 +372,7 @@ const ScoringSystem = () => {
 
     return group.answers.filter(
       (answer) =>
-        !safeHasOwnProperty(scores, answer.id) || animatingItems[answer.id]
+        !safeHasOwnProperty(scores, answer.id) // || animatingItems[answer.id]
     );
   };
 
@@ -425,10 +398,11 @@ const ScoringSystem = () => {
               <div
                 key={index}
                 className={`w-6 h-6 rounded-full mx-1 flex items-center justify-center text-xs font-bold
-                ${index < 5
+                ${
+                  index < 5
                     ? "bg-blue-600 text-white"
                     : "bg-gray-300 text-gray-600"
-                  }`}
+                }`}
               >
                 {index + 1}
               </div>
@@ -463,13 +437,14 @@ const ScoringSystem = () => {
               <div
                 className="bg-blue-600 h-2.5 rounded-full"
                 style={{
-                  width: `${(Object.keys(scores).length /
-                    answerGroups.reduce(
-                      (sum, group) => sum + group.answers.length,
-                      0
-                    )) *
+                  width: `${
+                    (Object.keys(scores).length /
+                      answerGroups.reduce(
+                        (sum, group) => sum + group.answers.length,
+                        0
+                      )) *
                     100
-                    }%`,
+                  }%`,
                 }}
               ></div>
             </div>
@@ -531,17 +506,17 @@ const ScoringSystem = () => {
                   </span>
                   <button
                     onClick={toggleHideScored}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${hideScored ? "bg-blue-600" : "bg-gray-300"
-                      }`}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                      hideScored ? "bg-blue-600" : "bg-gray-300"
+                    }`}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${hideScored ? "translate-x-6" : "translate-x-1"
-                        }`}
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        hideScored ? "translate-x-6" : "translate-x-1"
+                      }`}
                     />
                   </button>
                 </div>
-
-
 
                 {/* Toggle voor AI suggesties */}
                 <div className="flex items-center justify-end gap-2">
@@ -549,12 +524,14 @@ const ScoringSystem = () => {
                   verbergen
                   <button
                     onClick={() => setShowAISuggestions(!showAISuggestions)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${showAISuggestions ? "bg-purple-600" : "bg-gray-300"
-                      }`}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                      showAISuggestions ? "bg-purple-600" : "bg-gray-300"
+                    }`}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${showAISuggestions ? "translate-x-6" : "translate-x-1"
-                        }`}
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        showAISuggestions ? "translate-x-6" : "translate-x-1"
+                      }`}
                     />
                   </button>
                   tonen
@@ -585,233 +562,255 @@ const ScoringSystem = () => {
                 Pas alle AI-suggesties toe
               </button>
 
+                {answerGroups.map((group, groupIndex) => {
+                  const filteredAnswers = getFilteredAnswers(group);
 
-              {answerGroups.map((group, groupIndex) => {
-                const filteredAnswers = getFilteredAnswers(group);
+                  // Skip this group if it has no visible answers
+                  if (filteredAnswers.length === 0) return null;
 
-                // Skip this group if it has no visible answers
-                if (filteredAnswers.length === 0) return null;
+                  return (
+                    <div
+                      key={groupIndex}
+                      className="border-b last:border-b-0 mt-12"
+                    >
+                      <div className="px-4 py-2 font-medium text-xs uppercase text-gray-700 sticky z-10">
+                        {group.title}
 
-                return (
-                  <div
-                    key={groupIndex}
-                    className="border-b last:border-b-0 mt-12"
-                  >
-                    <div className="px-4 py-2 font-medium text-xs uppercase text-gray-700 sticky z-10">
-                      {group.title}
-
-                      <div>
-                        <Tooltip
-                          defaultOpen={groupIndex == 1 ? true : false}
-                        >
-                          <TooltipTrigger asChild>
-                            <div
-                              className="flex gap-2 mt-2"
-                              style={{ width: "fit-content" }}
+                        <div>
+                          <Tooltip defaultOpen={groupIndex == 1 ? true : false}>
+                            <TooltipTrigger asChild>
+                              <div
+                                className="flex gap-2 mt-2"
+                                style={{ width: "fit-content" }}
+                              >
+                                {[0, 1, 2].map((score) => (
+                                  <button
+                                    key={score}
+                                    onClick={() =>
+                                      handleGroupScoreChange(groupIndex, score)
+                                    }
+                                    className="w-8 h-8 rounded-full border-2 flex items-center justify-center border-gray-400 text-gray-600"
+                                  >
+                                    {score}
+                                  </button>
+                                ))}
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent
+                              className="normal-case"
+                              side="right"
+                              align="start"
                             >
-                              {[0, 1, 2].map((score) => (
-                                <button
-                                  key={score}
-                                  onClick={() =>
-                                    handleGroupScoreChange(groupIndex, score)
-                                  }
-                                  className="w-8 h-8 rounded-full border-2 flex items-center justify-center border-gray-400 text-gray-600"
-                                >
-                                  {score}
-                                </button>
-                              ))}
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent
-                            className="normal-case"
-                            side="right"
-                            align="start"
-                          >
-                            Scoor de groep
-                            <TooltipArrow
-                              fill="#ffffff"
-                              className="TooltipArrow border-white"
-                            />
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </div>
-
-                    {filteredAnswers.map((answer, index) => (
-                      <div
-                        key={answer.id}
-                        className={`px-4 py-3 border-t border-gray-100 flex items-center bg-white `}
-                        style={{
-                          transition: "all 0.5s ease",
-                          maxHeight: animatingItems[answer.id] ? "0" : "100px",
-                          opacity: animatingItems[answer.id] ? "0" : "1",
-                          overflow: animatingItems[answer.id]
-                            ? "hidden"
-                            : "visible",
-                        }}
-                      >
-                        <div className="flex-grow">
-                          <p
-                            className={`text-gray-800 ${safeHasOwnProperty(scores, answer.id) &&
-                              !hideScored
-                              ? "text-gray-500"
-                              : ""
-                              }`}
-                          >
-                            {highlightWaterWord(answer.text)}
-                          </p>
+                              Scoor de groep
+                              <TooltipArrow
+                                fill="#ffffff"
+                                className="TooltipArrow border-white"
+                              />
+                            </TooltipContent>
+                          </Tooltip>
                         </div>
+                      </div>
 
-                        <div className="flex items-center gap-2">
-                          {/* Docent scoring buttons met label */}
-                          <div
-                            className="flex gap-2 justify-center"
-                            style={{ width: "132px" }}
-                          >
-                            {[0, 1, 2].map((score) => (
-                              <button
-                                key={score}
-                                onClick={() =>
-                                  handleScoreChange(answer.id, score)
-                                }
-                                className={`w-8 h-8 rounded-full border flex items-center justify-center
-                                ${scores[answer.id] === score
+                      {filteredAnswers.map((answer, index) => (
+                        <Collapsible
+                          key={answer.id}
+                          className={`border-t border-gray-100 flex flex-col bg-white py-2`}
+                        >
+                          <div className="flex items-center px-4 gap-2">
+                            {/* <div className="flex flex-grow gap-2"> */}
+                              <CollapsibleTrigger
+                                className={`flex flex-grow gap-2 text-gray-800 ${
+                                  safeHasOwnProperty(scores, answer.id) &&
+                                  !hideScored
+                                    ? "text-gray-500"
+                                    : ""
+                                }`}
+                              >
+                                {highlightWaterWord(answer.text)}
+                              </CollapsibleTrigger>
+                              {/* <CandidatePopover names={answer.names} /> */}
+                            {/* </div> */}
+                            <div className="flex items-center gap-2">
+                              {/* Docent scoring buttons met label */}
+                              <div
+                                className="flex gap-2 justify-center"
+                                style={{ width: "132px" }}
+                              >
+                                {[0, 1, 2].map((score) => (
+                                  <button
+                                    key={score}
+                                    onClick={() =>
+                                      handleScoreChange(answer.id, score)
+                                    }
+                                    className={`w-8 h-8 rounded-full border flex items-center justify-center
+                                ${
+                                  scores[answer.id] === score
                                     ? score === answer.aiScore
                                       ? "bg-purple-600 text-white border-purple-600"
                                       : "bg-gray-700 text-white border-gray-700"
                                     : "border-gray-300 text-gray-600"
-                                  }`}
-                              >
-                                {score}
-                              </button>
-                            ))}
-                          </div>
+                                }`}
+                                  >
+                                    {score}
+                                  </button>
+                                ))}
+                              </div>
 
-                          {/* AI-suggestie or vraagteken knop */}
-                          <div
-                            className="flex items-center justify-center"
-                            style={{ width: "80px" }}
-                          >
-                            {/* Pijl om AI-suggestie over te nemen (altijd zichtbaar maar mogelijk disabled) */}
-                            <button
-                              onClick={() =>
-                                handleScoreChange(answer.id, answer.aiScore)
-                              }
-                              disabled={
-                                (!showAISuggestions &&
-                                  !visibleAIScores[answer.id]) ||
-                                scores[answer.id] === answer.aiScore
-                              }
-                              className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors
+                              {/* AI-suggestie or vraagteken knop */}
+                              <div
+                                className="flex items-center justify-center"
+                                style={{ width: "80px" }}
+                              >
+                                {/* Pijl om AI-suggestie over te nemen (altijd zichtbaar maar mogelijk disabled) */}
+                                <button
+                                  onClick={() =>
+                                    handleScoreChange(answer.id, answer.aiScore)
+                                  }
+                                  disabled={
+                                    (!showAISuggestions &&
+                                      !visibleAIScores[answer.id]) ||
+                                    scores[answer.id] === answer.aiScore
+                                  }
+                                  className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors
                               ${answer.confidence <= 10 ? `invisible` : ""}    
-                              ${scores[answer.id] === answer.aiScore ||
-                                  (!showAISuggestions &&
-                                    !visibleAIScores[answer.id])
+                              ${
+                                scores[answer.id] === answer.aiScore ||
+                                (!showAISuggestions &&
+                                  !visibleAIScores[answer.id])
                                   ? "bg-gray-200 text-gray-400 border border-gray-300 cursor-not-allowed invisible"
                                   : "bg-blue-100 hover:bg-blue-200 text-blue-600 border border-blue-300"
-                                }`}
-                              title={
-                                scores[answer.id] === answer.aiScore
-                                  ? "Score is al gelijk aan AI-suggestie"
-                                  : "Overnemen van AI-suggestie"
-                              }
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            </button>
-
-                            {answer.confidence > 10 ? (
-
-                              <Tooltip defaultOpen={(groupIndex == 1 || groupIndex == 0) && index == 0 ? true : false}>
-                                <Popover >
-                                  <TooltipTrigger asChild>
-                                    <PopoverTrigger asChild >
-                                      <button
-                                        onClick={() => togglePopup(answer.id)}
-                                        className={`ml-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors border bg-purple-100 text-purple-800 border-purple-300`}
-                                        title="AI-suggestie (klik voor details)"
-                                      >
-                                        <span
-                                          className={`${scores[answer.id] === answer.aiScore ||
-                                            showAISuggestions ||
-                                            visibleAIScores[answer.id]
-                                            ? ""
-                                            : "blur-sm"
-                                            }`}
-                                        >
-                                          {answer.aiScore}
-                                        </span>
-                                      </button>
-                                    </PopoverTrigger>
-                                  </TooltipTrigger>
-
-                                  <PopoverContent side="left" align="start" alignOffset={-54} sideOffset={200} className="w-80">
-                                    {/* AI-suggestie popup */}
-                                    <AISuggestionPopup
-                                      question={question}
-                                      answer={answer}
-                                      getAIExplanation={getAIExplanation}
-                                      highlightWaterWord={highlightWaterWord}
-                                      handleScoreChange={handleScoreChange}
-                                      visibleAIScores={visibleAIScores}
-                                      scores={scores}
-                                    />
-                                    <PopoverArrow
-                                      fill="#ffffff"
-                                      className="TooltipArrow border-white"
-                                    />
-                                  </PopoverContent>
-
-                                  <TooltipPortal>
-                                    <TooltipContent>
-                                      {scores[answer.id] === answer.aiScore ||
-                                        showAISuggestions ||
-                                        visibleAIScores[answer.id]
-                                        ? "Toon AI redenering achter score"
-                                        : "Toon AI score"}
-                                      <TooltipArrow
-                                        fill="#ffffff"
-                                        className="TooltipArrow border-white"
-                                      />
-                                    </TooltipContent>
-                                  </TooltipPortal>
-                                </Popover>
-                              </Tooltip>
-
-
-                            ) : (
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <button
-                                    className={`ml-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors border bg-white text-gray-400 border-gray-300`}
+                              }`}
+                                  title={
+                                    scores[answer.id] === answer.aiScore
+                                      ? "Score is al gelijk aan AI-suggestie"
+                                      : "Overnemen van AI-suggestie"
+                                  }
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
                                   >
-                                    ?
-                                  </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  Geen AI-suggestie beschikbaar
-                                </TooltipContent>
-                              </Tooltip>
-                            )}
-                          </div>
-                        </div>
-                        <CandidatePopover names={answer.names} />
-                      </div>
-                    ))}
-                  </div>
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                </button>
 
-                );
-              })}
+                                {answer.confidence > 10 ? (
+                                  <Tooltip
+                                    defaultOpen={
+                                      (groupIndex == 1 || groupIndex == 0) &&
+                                      index == 0
+                                        ? true
+                                        : false
+                                    }
+                                  >
+                                    <Popover>
+                                      <TooltipTrigger asChild>
+                                        <PopoverTrigger asChild>
+                                          <button
+                                            onClick={() =>
+                                              togglePopup(answer.id)
+                                            }
+                                            className={`ml-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors border bg-purple-100 text-purple-800 border-purple-300`}
+                                            title="AI-suggestie (klik voor details)"
+                                          >
+                                            <span
+                                              className={`${
+                                                scores[answer.id] ===
+                                                  answer.aiScore ||
+                                                showAISuggestions ||
+                                                visibleAIScores[answer.id]
+                                                  ? ""
+                                                  : "blur-sm"
+                                              }`}
+                                            >
+                                              {answer.aiScore}
+                                            </span>
+                                          </button>
+                                        </PopoverTrigger>
+                                      </TooltipTrigger>
+
+                                      <PopoverContent
+                                        side="left"
+                                        align="start"
+                                        alignOffset={-54}
+                                        sideOffset={200}
+                                        className="w-80"
+                                      >
+                                        {/* AI-suggestie popup */}
+                                        <AISuggestionPopup
+                                          question={question}
+                                          answer={answer}
+                                          highlightWaterWord={
+                                            highlightWaterWord
+                                          }
+                                          handleScoreChange={handleScoreChange}
+                                          visibleAIScores={visibleAIScores}
+                                          scores={scores}
+                                        />
+                                        <PopoverArrow
+                                          fill="#ffffff"
+                                          className="TooltipArrow border-white"
+                                        />
+                                      </PopoverContent>
+
+                                      <TooltipPortal>
+                                        <TooltipContent>
+                                          {scores[answer.id] ===
+                                            answer.aiScore ||
+                                          showAISuggestions ||
+                                          visibleAIScores[answer.id]
+                                            ? "Toon AI redenering achter score"
+                                            : "Toon AI score"}
+                                          <TooltipArrow
+                                            fill="#ffffff"
+                                            className="TooltipArrow border-white"
+                                          />
+                                        </TooltipContent>
+                                      </TooltipPortal>
+                                    </Popover>
+                                  </Tooltip>
+                                ) : (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <button
+                                        className={`ml-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors border bg-white text-gray-400 border-gray-300`}
+                                      >
+                                        ?
+                                      </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      Geen AI-suggestie beschikbaar
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <CollapsibleContent
+                            className="px-4 py-2 text-sm text-gray-600 h-auto"
+                            style={{
+                              height: "var(--radix-accordion-content-height)",
+                            }}
+                          >
+                            <ul className="text-sm text-gray-600">
+                              {answer.names?.map((name, index) => (
+                                <li key={index}>{name}</li>
+                              ))}
+                            </ul>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      ))}
+                    </div>
+                    
+                  );
+                })}
+              
             </div>
             <button className="bg-blue-600 mt-4 float-right text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
               Volgende vraag

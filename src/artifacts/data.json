@@ -5,43 +5,304 @@
     "instruction": "Noteer de abiotische factor uit de tekst die voor de kamsalamander belangrijk is.",
     "correctAnswer": "water"
   },
-  "aiExplanations": {
-    "1": {
-      "explanation": "Dit antwoord noemt direct en correct 'water' als abiotische factor. Water is essentieel voor de voortplanting van de kamsalamander zoals vermeld in de tekst.",
-      "similarAnswers": [
-        { "text": "water", "score": 2, "date": "12-04-2025" },
-        { "text": "Het water", "score": 2, "date": "23-03-2025" },
-        { "text": "water als abiotische factor", "score": 2, "date": "05-02-2025" },
-        { "text": "Water voor voortplanting", "score": 2, "date": "18-01-2025" }
-      ],
-      "confidence": 98
-    },
-    "2": {
-      "explanation": "Dit antwoord noemt correct 'Water' met een hoofdletter en een punt, maar benoemt dezelfde correcte abiotische factor als het juiste antwoord.",
-      "similarAnswers": [
-        { "text": "Water.", "score": 2, "date": "27-03-2025" },
-        { "text": "Water", "score": 2, "date": "14-02-2025" },
-        { "text": "Het water.", "score": 2, "date": "19-01-2025" }
-      ],
-      "confidence": 97
-    }
-  },
   "answers": [
-    { "id": 1, "text": "water", "aiScore": 2, "confidence": 98, "names": ["Jan de Vries", "Piet Jansen", "Klaas Bakker", "Henk Visser", "Anna de Boer"], "group": "Automatisch gescoorde antwoorden" },
-    { "id": 2, "text": "Water.", "aiScore": 2, "confidence": 97, "names": ["Jan de Vries", "Piet Jansen", "Klaas Bakker", "Henk Visser", "Anna de Boer"], "group": "Automatisch gescoorde antwoorden" },
-    { "id": 3, "text": "leeft vooral in de buurt van bossen en heggen", "aiScore": 0, "confidence": 94, "names": ["Sophie van Dijk", "Emma de Jong"], "group": "Bossen en heggen" },
-    { "id": 4, "text": "Hij leeft vooral in de buurt van bossen en heggen.", "aiScore": 0, "confidence": 93, "names": ["Sophie van Dijk", "Emma de Jong"], "group": "Bossen en heggen" },
-    { "id": 5, "text": "bossen en heggen", "aiScore": 0, "confidence": 92, "group": "Bossen en heggen" },
-    { "id": 6, "text": "leven in buurt van bossen en heggen", "aiScore": 0, "confidence": 91, "group": "Bossen en heggen" },
-    { "id": 7, "text": "nestgelegenheden", "aiScore": 0, "confidence": 4, "group": "Overige antwoorden" },
-    { "id": 8, "text": "de temperatuur", "aiScore": 1, "confidence": 82, "group": "Overige antwoorden" },
-    { "id": 9, "text": "andere dieren die de eitjes op eten", "aiScore": 0, "confidence": 9, "group": "Overige antwoorden" },
-    { "id": 10, "text": "watervlooien", "aiScore": 0, "confidence": 78, "group": "Overige antwoorden" },
-    { "id": 11, "text": "omgeving (bossen, heggen en water in de buurt)", "aiScore": 1, "confidence": 85, "group": "Overige antwoorden" },
-    { "id": 12, "text": "bosgroei", "aiScore": 0, "confidence": 4, "group": "Overige antwoorden" },
-    { "id": 13, "text": "de larven eten de watervlooien op.", "aiScore": 0, "confidence": 76, "group": "Overige antwoorden" },
-    { "id": 14, "text": "water bossen en heggen", "aiScore": 1, "confidence": 88, "group": "Overige antwoorden" },
-    { "id": 15, "text": "vele verschillende kleuren", "aiScore": 0, "confidence": 8, "group": "Overige antwoorden" },
-    { "id": 16, "text": "de kamsalamander is zeer zeldzaam in Nederland.", "aiScore": 0, "confidence": 74, "group": "Overige antwoorden" }
+    {
+      "id": 1,
+      "text": "water",
+      "aiScore": 2,
+      "confidence": 98,
+      "names": [
+        "Jan de Vries",
+        "Piet Jansen",
+        "Klaas Bakker",
+        "Henk Visser",
+        "Anna de Boer"
+      ],
+      "group": "Automatisch gescoorde antwoorden",
+      "similarAnswers": [
+        {
+          "text": "water",
+          "score": 2,
+          "date": "12-04-2025"
+        },
+        {
+          "text": "Het water",
+          "score": 2,
+          "date": "23-03-2025"
+        },
+        {
+          "text": "water als abiotische factor",
+          "score": 2,
+          "date": "05-02-2025"
+        },
+        {
+          "text": "Water voor voortplanting",
+          "score": 2,
+          "date": "18-01-2025"
+        }
+      ],
+      "frequency": 5
+    },
+    {
+      "id": 2,
+      "text": "Water.",
+      "aiScore": 2,
+      "confidence": 97,
+      "names": [
+        "Jan de Vries",
+        "Piet Jansen",
+        "Klaas Bakker",
+        "Henk Visser",
+        "Anna de Boer"
+      ],
+      "group": "Automatisch gescoorde antwoorden",
+      "similarAnswers": [
+        {
+          "text": "Water.",
+          "score": 2,
+          "date": "27-03-2025"
+        },
+        {
+          "text": "Water",
+          "score": 2,
+          "date": "14-02-2025"
+        },
+        {
+          "text": "Het water.",
+          "score": 2,
+          "date": "19-01-2025"
+        }
+      ],
+      "frequency": 1
+    },
+    {
+      "id": 3,
+      "text": "leeft vooral in de buurt van bossen en heggen",
+      "aiScore": 0,
+      "confidence": 94,
+      "names": [
+        "Sophie van Dijk",
+        "Emma de Jong"
+      ],
+      "group": "Bossen en heggen",
+      "similarAnswers": [],
+      "frequency": 1
+    },
+    {
+      "id": 4,
+      "text": "Hij leeft vooral in de buurt van bossen en heggen.",
+      "aiScore": 0,
+      "confidence": 93,
+      "names": [
+        "Sophie van Dijk"
+      ],
+      "group": "Bossen en heggen",
+      "similarAnswers": [],
+      "frequency": 1
+    },
+    {
+      "id": 5,
+      "text": "bossen en heggen",
+      "aiScore": 0,
+      "confidence": 92,
+            "names": [
+        "Emma de Jong"
+      ],
+      "group": "Bossen en heggen",
+      "similarAnswers": [],
+      "frequency": 1
+    },
+    {
+      "id": 6,
+      "text": "leven in buurt van bossen en heggen",
+      "aiScore": 0,
+      "confidence": 91,
+            "names": [
+        "Piet Jansen"
+        
+      ],
+      "group": "Bossen en heggen",
+      "similarAnswers": [],
+      "frequency": 1
+    },
+    {
+      "id": 7,
+      "text": "nestgelegenheden",
+      "aiScore": 0,
+      "confidence": 4,
+            "names": [
+        "Mohammed Ceskin"
+      ],
+      "group": "Overige antwoorden",
+      "similarAnswers": [],
+      "frequency": 1
+    },
+    {
+      "id": 8,
+      "text": "de temperatuur",
+      "aiScore": 1,
+      "confidence": 82,
+      "group": "Overige antwoorden",
+      "similarAnswers": [
+        {
+          "text": "temperatuur",
+          "score": 1,
+          "date": "29-03-2025"
+        },
+        {
+          "text": "de temperatuur van het water",
+          "score": 1,
+          "date": "12-02-2025"
+        },
+        {
+          "text": "omgevingstemperatuur",
+          "score": 1,
+          "date": "05-01-2025"
+        }
+      ],
+      "frequency": 1
+    },
+    {
+      "id": 9,
+      "text": "andere dieren die de eitjes op eten",
+      "aiScore": 0,
+      "confidence": 9,
+      "group": "Overige antwoorden",
+      
+      "similarAnswers": [],
+      "frequency": 1
+    },
+    {
+      "id": 10,
+      "text": "watervlooien",
+      "aiScore": 0,
+      "confidence": 54,
+      "group": "Overige antwoorden",
+      "similarAnswers": [
+        {
+          "text": "watervlooien",
+          "score": 1,
+          "date": "15-04-2025"
+        },
+        {
+          "text": "waterdieren",
+          "score": 1,
+          "date": "22-03-2025"
+        },
+        {
+          "text": "kleine waterdieren",
+          "score": 1,
+          "date": "09-02-2025"
+        },
+        {
+          "text": "voedsel in water",
+          "score": 1,
+          "date": "21-01-2025"
+        }
+      ],
+      "frequency": 1
+    },
+    {
+      "id": 11,
+      "text": "omgeving (bossen, heggen en water in de buurt)",
+      "aiScore": 1,
+      "confidence": 85,
+      "group": "Overige antwoorden",
+      "similarAnswers": [
+        {
+          "text": "omgeving met water en bossen",
+          "score": 1,
+          "date": "18-04-2025"
+        },
+        {
+          "text": "bossen, heggen en wateromgeving",
+          "score": 1,
+          "date": "03-03-2025"
+        },
+        {
+          "text": "natuurlijke omgeving met water",
+          "score": 1,
+          "date": "27-01-2025"
+        }
+      ],
+      "frequency": 1
+    },
+    {
+      "id": 12,
+      "text": "bosgroei",
+      "aiScore": 0,
+      "confidence": 4,
+      "group": "Overige antwoorden",
+      "similarAnswers": [],
+      "frequency": 1
+    },
+    {
+      "id": 13,
+      "text": "de larven eten de watervlooien op.",
+      "aiScore": 0,
+      "confidence": 76,
+      "group": "Overige antwoorden",
+      "similarAnswers": [
+        {
+          "text": "larven eten",
+          "score": 1,
+          "date": "15-04-2025"
+        },
+        {
+          "text": "voedsel voor larven",
+          "score": 1,
+          "date": "22-03-2025"
+        },
+        {
+          "text": "watervlooien als voedsel",
+          "score": 1,
+          "date": "09-02-2025"
+        }
+      ],
+      "frequency": 1
+    },
+    {
+      "id": 14,
+      "text": "water bossen en heggen",
+      "aiScore": 1,
+      "confidence": 88,
+      "group": "Overige antwoorden",
+      "similarAnswers": [
+        {
+          "text": "water en bossen",
+          "score": 1,
+          "date": "11-04-2025"
+        },
+        {
+          "text": "water, bossen en begroeiing",
+          "score": 1,
+          "date": "25-02-2025"
+        },
+        {
+          "text": "water in bosrijke omgeving",
+          "score": 1,
+          "date": "08-01-2025"
+        }
+      ],
+      "frequency": 1
+    },
+    {
+      "id": 15,
+      "text": "vele verschillende kleuren",
+      "aiScore": 0,
+      "confidence": 8,
+      "group": "Overige antwoorden",
+      "similarAnswers": [],
+      "frequency": 1
+    },
+    {
+      "id": 16,
+      "text": "de kamsalamander is zeer zeldzaam in Nederland.",
+      "aiScore": 0,
+      "confidence": 5,
+      "group": "Overige antwoorden",
+      "similarAnswers": [],
+      "frequency": 1
+    }
   ]
 }
