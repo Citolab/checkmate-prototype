@@ -786,7 +786,7 @@ const ScoringSystem = () => {
                             {answer.names?.map((name, index) => (
                               <>
                                 <div key={index}>{name}</div>
-                                <div class="flex items-center gap-2">
+                                <div className="flex items-center gap-2">
                                   <input placeholder="typ hier feedback aan de student" type="text" className="border rounded-md px-2 py-1 w-full" />
                                   <MessageSquareIcon className="w-4 h-4 text-gray-500" />
                                 </div>
