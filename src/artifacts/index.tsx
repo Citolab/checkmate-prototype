@@ -21,7 +21,7 @@ import {
 } from "../components/ui/collapsible";
 import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
 import { TooltipArrow, TooltipPortal } from "@radix-ui/react-tooltip";
-import { ChevronDown, MessageSquareIcon } from "lucide-react";
+import { ChevronDown, CopyIcon, MessageSquareIcon } from "lucide-react";
 import AnnotateText from './annotate-text';
 
 const AISuggestionPopup = ({
@@ -147,19 +147,30 @@ const AISuggestionPopup = ({
           <h4 className="font-medium text-gray-700 mb-2">
             Generative AI feedback:
           </h4>
-          <div className="text-sm text-gray-700 bg-purple-50 p-3 rounded-md border border-purple-100 flex justify-center">
+            <div className="text-sm text-gray-700 bg-purple-50 p-3 items-center rounded-md border border-purple-100 flex justify-center">
             {/* {getAIExplanation(answer.id)?.explanation} */}
+                        <a
+              href={`https://chat.openai.com/?model=gpt-4&prompt=${encodeURIComponent(
+              `Vraag: ${question.title} ${question.text}\nAntwoordmodel: ${question.correctAnswer}\nAntwoord van leerling: ${answer.text}\nMaximale score: 2\n\nMet deze vraag, dit antwoordmodel en deze maximale score, wat zou jij de leerling als score geven?`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-2 text-purple-600 underline"
+            >
+              Open ChatGPT
+            </a>
             <button
               onClick={() => {
-                const prompt = `Vraag: ${question.title} ${question.text}\nAntwoordmodel: ${question.correctAnswer}\nAntwoord van leerling: ${answer.text}\nMaximale score: 2\n\nMet deze vraag, dit antwoordmodel en deze maximale score, wat zou jij de leerling als score geven?`;
-                navigator.clipboard.writeText(prompt);
-                alert("Prompt gekopieerd naar klembord!");
+              const prompt = `Vraag: ${question.title} ${question.text}\nAntwoordmodel: ${question.correctAnswer}\nAntwoord van leerling: ${answer.text}\nMaximale score: 2\n\nMet deze vraag, dit antwoordmodel en deze maximale score, wat zou jij de leerling als score geven?`;
+              navigator.clipboard.writeText(prompt);
+              alert("Prompt gekopieerd naar klembord!");
               }}
-              className="bg-purple-600 text-white px-2 py-1 text-sm rounded-md hover:bg-purple-700 transition"
+              className="bg-purple-600 ml-2 text-white px-2 py-1 text-sm rounded-md hover:bg-purple-700 transition"
             >
-              Kopieer prompt
+              <CopyIcon className="w-4 h-4" />
             </button>
-          </div>
+
+            </div>
           <p className="mt-2 text-sm text-gray-400">
             gebruik de prompt om zelf in je chatgpt te kijken hoeveel punten die
             geeft
@@ -181,41 +192,6 @@ const ScoringSystem = () => {
 
   // Vraag en antwoordmodel
   const question = jsonData.question;
-
-  // AI-uitleg voor antwoorden
-  // const aiExplanations = jsonData.aiExplanations;
-
-  // Voor antwoorden zonder specifieke uitleg
-  // const getDefaultExplanation = (answerId, score) => {
-  //   const answer = answerGroups
-  //     .flatMap((g) => g.answers)
-  //     .find((a) => a.id === answerId);
-  //   if (!answer) return null;
-
-  //   let explanation = "";
-  //   let similarAnswers = [];
-  //   let confidence = 0;
-
-  //   if (score === 0) {
-  //     explanation = `Het antwoord "${answer.text}" bevat geen correcte abiotische factor voor de kamsalamander. De tekst geeft aan dat water de belangrijke abiotische factor is, maar dit wordt niet genoemd in het antwoord.`;
-  //     similarAnswers = [
-  //       { text: "de larven eten watervlooien", score: 0, date: "20-03-2025" },
-  //       { text: "zeldzaamheid", score: 0, date: "17-02-2025" },
-  //       { text: "voedsel voor de larven", score: 0, date: "12-01-2025" },
-  //     ];
-  //     confidence = 78;
-  //   } else if (score === 1) {
-  //     explanation = `Het antwoord "${answer.text}" bevat elementen die deels correct zijn, maar mist precisie of bevat ook incorrecte elementen. De tekst identificeert water als de belangrijke abiotische factor.`;
-  //     similarAnswers = [
-  //       { text: "wateromgeving", score: 1, date: "05-04-2025" },
-  //       { text: "vochtige gebieden", score: 1, date: "19-02-2025" },
-  //       { text: "waterpoel of vijver", score: 1, date: "25-01-2025" },
-  //     ];
-  //     confidence = 75;
-  //   }
-
-  //   return { explanation, similarAnswers, confidence };
-  // };
 
   function groupAnswersByTitle(answers: JsonData["answers"]) {
     const grouped: Record<string, typeof answers> = {};
