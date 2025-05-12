@@ -557,9 +557,9 @@ const ScoringSystem = () => {
                               className="flex gap-2"
                               style={{ width: "fit-content" }}
                             >
-                              {[0, 1, 2].map((score) => (
+                              {[0, 1, 2].map((score, index) => (
                                 <button
-                                  key={score}
+                                  key={index}
                                   onClick={() =>
                                     handleGroupScoreChange(groupIndex, score)
                                   }
@@ -589,7 +589,7 @@ const ScoringSystem = () => {
 
                     {filteredAnswers.map((answer, index) => (
                       <Collapsible
-                        key={answer.id}
+                        key={index}
                         className={`border-t border-gray-100 flex flex-col bg-white py-2`}
                       >
                         <div className="flex items-center px-4 gap-2">
@@ -611,9 +611,9 @@ const ScoringSystem = () => {
                             />
                             <div className="text-sm text-slate-400">{answer.frequency > 1 ? '×' + answer.frequency : ''}</div>
 
-                            <button className="flex items-center gap-1 text-gray-600 hover:text-gray-800 transition">
+                            <div className="flex items-center gap-1 text-gray-600 hover:text-gray-800 transition">
                               <ChevronDown className="w-4 h-4" />
-                            </button>
+                            </div>
                           </CollapsibleTrigger>
                           {/* <CandidatePopover names={answer.names} /> */}
                           {/* </div> */}
@@ -784,13 +784,13 @@ const ScoringSystem = () => {
                         >
                           <div className="text-sm text-gray-600 grid grid-cols-2 gap-4">
                             {answer.names?.map((name, index) => (
-                              <>
+                              <div key={index}>
                                 <div key={index}>{name}</div>
                                 <div className="flex items-center gap-2">
                                   <input placeholder="typ hier feedback aan de student" type="text" className="border rounded-md px-2 py-1 w-full" />
                                   <MessageSquareIcon className="w-4 h-4 text-gray-500" />
                                 </div>
-                              </>
+                              </div>
                             ))}
                           </div>
                         </CollapsibleContent>
