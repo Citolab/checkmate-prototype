@@ -218,7 +218,15 @@ const ScoringSystem = () => {
   // };
 
   function groupAnswersByTitle(answers: JsonData["answers"]) {
-    const grouped = Object.groupBy(answers, (answer) => answer.group);
+    const grouped: Record<string, typeof answers> = {};
+
+    for (const answer of answers) {
+      const group = answer.group;
+      if (!grouped[group]) {
+        grouped[group] = [];
+      }
+      grouped[group].push(answer);
+    }
 
     return {
       answerGroups: Object.entries(grouped).map(([title, answers]) => ({
@@ -227,6 +235,7 @@ const ScoringSystem = () => {
       })),
     };
   }
+
   // Antwoorden gegroepeerd
   const answerGroups = groupAnswersByTitle(jsonData.answers).answerGroups;
 

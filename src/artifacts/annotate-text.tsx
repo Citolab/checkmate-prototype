@@ -11,7 +11,7 @@ const AnnotateText: React.FC<AnnotateTextProps> = ({ text, onAnnotation }) => {
   const [popoverPosition, setPopoverPosition] = useState<{ x: number; y: number } | null>(null);
   const [feedback, setFeedback] = useState<string>('');
 
-  const handleMouseUp = (event: React.MouseEvent) => {
+  const handleMouseUp = (_: React.MouseEvent) => {
     const selection = window.getSelection();
     if (selection && selection.toString().trim()) {
       const range = selection.getRangeAt(0);
@@ -49,7 +49,8 @@ const AnnotateText: React.FC<AnnotateTextProps> = ({ text, onAnnotation }) => {
       ))}
 
       {popoverPosition && selectedText && (
-        <Popover position={popoverPosition} onClose={() => setPopoverPosition(null)}>
+        <Popover> {/* position={popoverPosition} onClose={() => setPopoverPosition(null)} */}
+          <PopoverContent asChild>
           
           <div className="flex flex-col gap-2">
             <button onClick={() => handleAction('correct')} className="bg-green-500 text-white px-2 py-1 rounded">Mark as Correct</button>
@@ -65,7 +66,7 @@ const AnnotateText: React.FC<AnnotateTextProps> = ({ text, onAnnotation }) => {
               <button onClick={() => handleAction('feedback')} className="bg-blue-500 text-white px-2 py-1 rounded mt-2">Submit Feedback</button>
             </div>
           </div>
-       
+        </PopoverContent>
         </Popover>
       )}
     </div>
