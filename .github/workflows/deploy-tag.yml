@@ -1,0 +1,41 @@
+name: Deploy React Vite app on Tag
+
+on:
+  push:
+    tags:
+      - '*' # Trigger on any tag push
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # Step 4: Build the Vite app
+      - name: Build Vite app with tag path
+        run: |
+          export TAG_NAME=${GITHUB_REF##*/}
+          echo "TAG=$TAG_NAME" >> $GITHUB_ENV
+          npm run build
+
+      # Step 5: Deploy to GitHub Pages under the tag folder
+      - name: Deploy to GitHub Pages under tag folder
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          destination_dir: ${{ github.ref_name }} # Use the tag name as the folder
+          keep_files: true
