@@ -151,7 +151,7 @@ const AISuggestionPopup = ({
             {/* {getAIExplanation(answer.id)?.explanation} */}
                         <a
               href={`https://chat.openai.com/?model=gpt-4&prompt=${encodeURIComponent(
-              `Vraag: ${question.title} ${question.text}\nAntwoordmodel: ${question.correctAnswer}\nAntwoord van leerling: ${answer.text}\nMaximale score: 2\n\nMet deze vraag, dit antwoordmodel en deze maximale score, wat zou jij de leerling als score geven?`
+              `Vraag: ${question.title} ${question.text}\n\nAntwoordmodel: ${question.correctAnswer}\n\nAntwoord van leerling: ${answer.text}\n\nMaximale score: 2\n\nMet deze vraag, dit antwoordmodel en deze maximale score, wat zou jij de leerling als score geven? geeft als eerste de score, en houd de redenering kort.`
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -161,7 +161,7 @@ const AISuggestionPopup = ({
             </a>
             <button
               onClick={() => {
-              const prompt = `Vraag: ${question.title} ${question.text}\nAntwoordmodel: ${question.correctAnswer}\nAntwoord van leerling: ${answer.text}\nMaximale score: 2\n\nMet deze vraag, dit antwoordmodel en deze maximale score, wat zou jij de leerling als score geven?`;
+              const prompt = `Vraag: ${question.title} ${question.text}\nAntwoordmodel: ${question.correctAnswer}\nAntwoord van leerling: ${answer.text}\nMaximale score: 2\n\nMet deze vraag, dit antwoordmodel en deze maximale score, wat zou jij de leerling als score geven? geeft als eerste de score, en houd de redenering kort.`;
               navigator.clipboard.writeText(prompt);
               alert("Prompt gekopieerd naar klembord!");
               }}
@@ -786,10 +786,10 @@ const ScoringSystem = () => {
                             {answer.names?.map((name, index) => (
                               <div key={index}>
                                 <div key={index}>{name}</div>
-                                <div className="flex items-center gap-2">
+                                {/* <div className="flex items-center gap-2">
                                   <input placeholder="typ hier feedback aan de student" type="text" className="border rounded-md px-2 py-1 w-full" />
                                   <MessageSquareIcon className="w-4 h-4 text-gray-500" />
-                                </div>
+                                </div> */}
                               </div>
                             ))}
                           </div>
