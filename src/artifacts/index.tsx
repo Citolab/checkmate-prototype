@@ -21,7 +21,8 @@ import {
 } from "../components/ui/collapsible";
 import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
 import { TooltipArrow, TooltipPortal } from "@radix-ui/react-tooltip";
-import { MessageSquareIcon } from "lucide-react";
+import { ChevronDown, MessageSquareIcon } from "lucide-react";
+import AnnotateText from './annotate-text';
 
 const AISuggestionPopup = ({
   question,
@@ -256,7 +257,7 @@ const ScoringSystem = () => {
         ...correctScores,
       }));
     }
-  }, []); // Removed jsonData.answerGroups from the dependency array
+  }, []); // Added 'answerGroups' to the dependency array
 
   // Safe utility function for hasOwnProperty
   const safeHasOwnProperty = (obj, prop) =>
@@ -383,9 +384,9 @@ const ScoringSystem = () => {
 
   return (
     <TooltipProvider delayDuration={100}>
-      <div className="flex bg-gray-200 overflow-hidden p-6 rounded-sm h-dvh">
+      <div className="flex bg-gray-200 overflow-hidden rounded-sm h-dvh">
         {/* Linker kolom - Vraag */}
-        <div className="w-1/3 mr-6">
+        <div className="w-1/3 mr-6 p-6">
           {/* Progress Circles for Items */}
           <div className="flex justify-center items-center mb-4">
             {[...Array(12)].map((_, index) => (
@@ -412,35 +413,35 @@ const ScoringSystem = () => {
             </div>
           </div>
 
-          <div className="bg-gray-100 p-4 rounded-lg shadow-sm mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <div className="text-sm font-medium text-gray-700">
-                Voortgang beoordeling
-              </div>
-              <div className="text-sm text-gray-600">
-                {Object.keys(scores).length} van{" "}
-                {answerGroups.reduce(
-                  (sum, group) => sum + group.answers.length,
-                  0
-                )}{" "}
-                antwoorden
-              </div>
+          {/* <div className="bg-gray-100 p-4 rounded-lg shadow-sm mb-4"> */}
+          <div className="flex justify-between items-center mb-2">
+            <div className="text-sm font-medium text-gray-700">
+              Voortgang beoordeling
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
-              <div
-                className="bg-blue-600 h-2.5 rounded-full"
-                style={{
-                  width: `${(Object.keys(scores).length /
-                      answerGroups.reduce(
-                        (sum, group) => sum + group.answers.length,
-                        0
-                      )) *
-                    100
-                    }%`,
-                }}
-              ></div>
+            <div className="text-sm text-gray-600">
+              {Object.keys(scores).length} van{" "}
+              {answerGroups.reduce(
+                (sum, group) => sum + group.answers.length,
+                0
+              )}{" "}
+              antwoorden
             </div>
           </div>
+          <div className="w-full bg-gray-100 rounded-full h-2.5 mb-2">
+            <div
+              className="bg-blue-600 h-2.5 rounded-full"
+              style={{
+                width: `${(Object.keys(scores).length /
+                  answerGroups.reduce(
+                    (sum, group) => sum + group.answers.length,
+                    0
+                  )) *
+                  100
+                  }%`,
+              }}
+            ></div>
+          </div>
+          {/* </div> */}
 
           {/* Antwoordmodel los bovenin */}
           <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
@@ -478,14 +479,14 @@ const ScoringSystem = () => {
         {/* Rechter kolom - Antwoordmodel en antwoorden */}
         <div
           ref={rightColumnRef}
-          className="flex-1 flex flex-col h-full overflow-auto"
+          className="flex-1 flex flex-col h-full overflow-auto p-6 bg-gray-50"
         >
           {/* Voortgangsbalk in grijze gebied */}
 
           {/* Scrollbare antwoorden container */}
           <div className="pr-1">
             {/* Antwoordentabel zonder blauwe header */}
-            <div className="rounded-lg shadow-sm overflow-y-auto flex-grow relative">
+            <div className="rounded-lg overflow-y-auto flex-grow relative">
               {/* Kolomlabels */}
               <div className="px-4 py-2 flex items-center justify-between">
                 {/* <div className="flex-grow font-medium text-gray-700">Antwoord</div> */}
@@ -561,14 +562,14 @@ const ScoringSystem = () => {
                     key={groupIndex}
                     className="border-b last:border-b-0 mt-12"
                   >
-                    <div className="px-4 py-2 font-medium text-xs uppercase text-gray-700 sticky z-10">
-                      {group.title}
+                    <div className="flex px-4 py-2 font-medium text-xs uppercase text-gray-700 sticky z-10">
 
-                      <div>
+                      <div className="flex-1"><p className="text-gray-400">{group.title}</p></div>
+                      <div className="flex items-center gap-2 justify-between">
                         <Tooltip defaultOpen={groupIndex == 1 ? true : false}>
                           <TooltipTrigger asChild>
                             <div
-                              className="flex gap-2 mt-2"
+                              className="flex gap-2"
                               style={{ width: "fit-content" }}
                             >
                               {[0, 1, 2].map((score) => (
@@ -586,7 +587,7 @@ const ScoringSystem = () => {
                           </TooltipTrigger>
                           <TooltipContent
                             className="normal-case"
-                            side="right"
+                            side="left"
                             align="start"
                           >
                             Scoor de groep
@@ -596,7 +597,9 @@ const ScoringSystem = () => {
                             />
                           </TooltipContent>
                         </Tooltip>
+
                       </div>
+                      <div className="w-24"></div>
                     </div>
 
                     {filteredAnswers.map((answer, index) => (
@@ -606,14 +609,26 @@ const ScoringSystem = () => {
                       >
                         <div className="flex items-center px-4 gap-2">
                           {/* <div className="flex flex-grow gap-2"> */}
+
                           <CollapsibleTrigger
-                            className={`flex flex-grow gap-2 text-gray-800 ${safeHasOwnProperty(scores, answer.id) &&
-                                !hideScored
-                                ? "text-gray-500"
-                                : ""
+                            className={`flex flex-grow items-center gap-2 text-gray-800 ${safeHasOwnProperty(scores, answer.id) &&
+                              !hideScored
+                              ? "text-gray-500"
+                              : ""
                               }`}
                           >
-                            {highlightWaterWord(answer.text)}
+                            <AnnotateText
+                              text={answer.text}
+                              onAnnotation={(selection, action, feedback) => {
+                                console.log('Annotation:', { selection, action, feedback });
+                                // Handle the annotation logic here
+                              }}
+                            />
+                            <div className="text-sm text-slate-400">{answer.frequency > 1 ? '×' + answer.frequency : ''}</div>
+
+                            <button className="flex items-center gap-1 text-gray-600 hover:text-gray-800 transition">
+                              <ChevronDown className="w-4 h-4" />
+                            </button>
                           </CollapsibleTrigger>
                           {/* <CandidatePopover names={answer.names} /> */}
                           {/* </div> */}
@@ -706,11 +721,11 @@ const ScoringSystem = () => {
                                         >
                                           <span
                                             className={`${scores[answer.id] ===
-                                                answer.aiScore ||
-                                                showAISuggestions ||
-                                                visibleAIScores[answer.id]
-                                                ? ""
-                                                : "blur-sm"
+                                              answer.aiScore ||
+                                              showAISuggestions ||
+                                              visibleAIScores[answer.id]
+                                              ? ""
+                                              : "blur-sm"
                                               }`}
                                           >
                                             {answer.aiScore}
@@ -749,8 +764,8 @@ const ScoringSystem = () => {
                                           answer.aiScore ||
                                           showAISuggestions ||
                                           visibleAIScores[answer.id]
-                                          ? "Toon AI redenering achter score"
-                                          : "Toon AI score"}
+                                          ? "AI score"
+                                          : "AI redenering"}
                                         <TooltipArrow
                                           fill="#ffffff"
                                           className="TooltipArrow border-white"

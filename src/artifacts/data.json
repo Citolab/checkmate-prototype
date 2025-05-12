@@ -81,7 +81,6 @@
       "aiScore": 0,
       "confidence": 94,
       "names": [
-        "Sophie van Dijk",
         "Emma de Jong"
       ],
       "group": "Bossen en heggen",
@@ -105,8 +104,10 @@
       "text": "bossen en heggen",
       "aiScore": 0,
       "confidence": 92,
-            "names": [
-        "Emma de Jong"
+      "names": [
+        "Friso de Witt",
+        "Tjeerd Janssen",
+        "Xing Pao"
       ],
       "group": "Bossen en heggen",
       "similarAnswers": [],
@@ -117,9 +118,8 @@
       "text": "leven in buurt van bossen en heggen",
       "aiScore": 0,
       "confidence": 91,
-            "names": [
+      "names": [
         "Piet Jansen"
-        
       ],
       "group": "Bossen en heggen",
       "similarAnswers": [],
@@ -130,7 +130,7 @@
       "text": "nestgelegenheden",
       "aiScore": 0,
       "confidence": 4,
-            "names": [
+      "names": [
         "Mohammed Ceskin"
       ],
       "group": "Overige antwoorden",
@@ -143,6 +143,9 @@
       "aiScore": 1,
       "confidence": 82,
       "group": "Overige antwoorden",
+      "names": [
+        "Henk de Groene"
+      ],
       "similarAnswers": [
         {
           "text": "temperatuur",
@@ -168,7 +171,9 @@
       "aiScore": 0,
       "confidence": 9,
       "group": "Overige antwoorden",
-      
+      "names": [
+        "Mirthe van der Weerd"
+      ],
       "similarAnswers": [],
       "frequency": 1
     },
@@ -178,6 +183,9 @@
       "aiScore": 0,
       "confidence": 54,
       "group": "Overige antwoorden",
+      "names": [
+        "Kim van Lianen"
+      ],
       "similarAnswers": [
         {
           "text": "watervlooien",
@@ -208,6 +216,9 @@
       "aiScore": 1,
       "confidence": 85,
       "group": "Overige antwoorden",
+      "names": [
+        "Dries de groot"
+      ],
       "similarAnswers": [
         {
           "text": "omgeving met water en bossen",
@@ -232,6 +243,9 @@
       "text": "bosgroei",
       "aiScore": 0,
       "confidence": 4,
+      "names": [
+        "Priscilla zwartjes"
+      ],
       "group": "Overige antwoorden",
       "similarAnswers": [],
       "frequency": 1
@@ -241,6 +255,9 @@
       "text": "de larven eten de watervlooien op.",
       "aiScore": 0,
       "confidence": 76,
+      "names": [
+        "Wesly de Vries"
+      ],
       "group": "Overige antwoorden",
       "similarAnswers": [
         {
@@ -267,6 +284,9 @@
       "aiScore": 1,
       "confidence": 88,
       "group": "Overige antwoorden",
+      "names": [
+        "Dunya Deesi"
+      ],
       "similarAnswers": [
         {
           "text": "water en bossen",
@@ -290,6 +310,9 @@
       "id": 15,
       "text": "vele verschillende kleuren",
       "aiScore": 0,
+      "names": [
+        "Diano Voorstenkamp"
+      ],
       "confidence": 8,
       "group": "Overige antwoorden",
       "similarAnswers": [],
@@ -299,6 +322,9 @@
       "id": 16,
       "text": "de kamsalamander is zeer zeldzaam in Nederland.",
       "aiScore": 0,
+      "names": [
+        "Giorgos Donyous"
+      ],
       "confidence": 5,
       "group": "Overige antwoorden",
       "similarAnswers": [],
