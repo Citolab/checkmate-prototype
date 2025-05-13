@@ -40,3 +40,12 @@ jobs:
           publish_dir: ./dist
           destination_dir: ${{ github.ref_name }} # Use the tag name as the folder
           keep_files: true
+
+      # Step 6: Log the published URL
+      - name: Log published URL
+        run: |
+          REPO_NAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
+          TAG_NAME=${GITHUB_REF##*/}
+          PUBLISHED_URL="https://${GITHUB_REPOSITORY_OWNER}.github.io/${REPO_NAME}/${TAG_NAME}/"
+          echo "Published URL: $PUBLISHED_URL"
+          echo "PUBLISHED_URL=$PUBLISHED_URL" >> $GITHUB_ENV
