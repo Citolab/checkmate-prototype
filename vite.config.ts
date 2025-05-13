@@ -5,6 +5,7 @@ import Pages from 'vite-plugin-pages';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '', // use relative paths for GitHub Pages and testing, while setting base href in index.html
   plugins: [
     react(),
     Pages({
