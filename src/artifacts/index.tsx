@@ -145,7 +145,7 @@ const AISuggestionPopup = ({
 
         <div>
           <h4 className="font-medium text-gray-700 mb-2">
-            Generative AI feedback:
+            Generative AI scoring:
           </h4>
             <div className="text-sm text-gray-700 bg-purple-50 p-3 items-center rounded-md border border-purple-100 flex justify-center">
             {/* {getAIExplanation(answer.id)?.explanation} */}
