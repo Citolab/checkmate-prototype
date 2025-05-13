@@ -21,7 +21,7 @@ import {
 } from "../components/ui/collapsible";
 import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
 import { TooltipArrow, TooltipPortal } from "@radix-ui/react-tooltip";
-import { ChevronDown, CopyIcon, MessageSquareIcon } from "lucide-react";
+import { ChevronDown, CopyIcon } from "lucide-react";
 import AnnotateText from './annotate-text';
 
 const AISuggestionPopup = ({
