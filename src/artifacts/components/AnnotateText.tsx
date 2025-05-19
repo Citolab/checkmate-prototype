@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Popover, PopoverContent } from '../components/ui/popover'; // Assuming you have a Popover component
+import { Popover, PopoverContent } from '../../components/ui/popover'; // Assuming you have a Popover component
 
 interface AnnotateTextProps {
   text: string;
