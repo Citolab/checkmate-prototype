@@ -107,6 +107,7 @@ const RTTIDashboard = () => {
     const [data, setData] = useState(null);
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [currentTab, setCurrentTab] = useState('rapportage');
+    const [sortConfig, setSortConfig] = useState({ key: 'grade', direction: 'desc' });
 
     useEffect(() => {
         const generatedData = generateRandomData();
@@ -141,8 +142,47 @@ const RTTIDashboard = () => {
         'I': '#FFD700'  // Gold
     };
 
-    const sortStudents = (a, b) => {
-        return b.grade - a.grade;
+    // Helper: Calculate RTTI correct percentage for a student
+    const getStudentRttiCorrect = (student, category) => {
+        const categoryQuestions = questions.filter(q => q.category === category);
+        if (categoryQuestions.length === 0) return 0;
+        const correctCount = student.questionScores.filter(qs => {
+            const q = questions.find(qq => qq.id === qs.questionId);
+            return q && q.category === category && qs.correct;
+        }).length;
+        return Math.round((correctCount / categoryQuestions.length) * 100);
+    };
+
+    // Sorting logic
+    const sortedStudents = [...students].sort((a, b) => {
+        const { key, direction } = sortConfig;
+        let aValue = a[key];
+        let bValue = b[key];
+        if (['R', 'T1', 'T2', 'I'].includes(key)) {
+            aValue = getStudentRttiCorrect(a, key);
+            bValue = getStudentRttiCorrect(b, key);
+        } else if (key === 'grade') {
+            aValue = parseFloat(a.grade);
+            bValue = parseFloat(b.grade);
+        } else if (key === 'totalScore') {
+            aValue = a.totalScore;
+            bValue = b.totalScore;
+        } else if (key === 'name') {
+            aValue = a.name.toLowerCase();
+            bValue = b.name.toLowerCase();
+        }
+        if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    const handleSort = (key) => {
+        setSortConfig(prev => {
+            if (prev.key === key) {
+                return { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
+            }
+            return { key, direction: 'desc' };
+        });
     };
 
     const renderSummaryCards = () => {
@@ -243,44 +283,65 @@ const RTTIDashboard = () => {
         return (
             <div className="bg-white rounded-lg shadow-md p-4 h-full">
                 <h2 className="text-lg font-bold mb-4 text-gray-800">Leerlingen</h2>
-                <div className="overflow-y-auto max-h-[80vh]">
-                    <table className="min-w-full">
-                        <thead className="sticky top-0 bg-white">
-                            <tr className="bg-gray-100 rounded-md">
-                                <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Naam</th>
-                                <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Cijfer</th>
-                                <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Score</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {students.sort(sortStudents).map(student => (
-                                <tr
-                                    key={student.id}
-                                    className={`border-b hover:bg-gray-50 cursor-pointer transition-colors ${selectedStudent && selectedStudent.id === student.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''}`}
-                                    onClick={() => setSelectedStudent(student)}
-                                >
-                                    <td className="py-3 px-4">{student.name}</td>
-                                    <td className="py-3 px-4">
-                                        <span className={`font-bold py-1 px-2 rounded-md text-white ${parseFloat(student.grade) >= 5.5 ? 'bg-green-500' : 'bg-red-500'}`}>
-                                            {student.grade}
-                                        </span>
-                                    </td>
-                                    <td className="py-3 px-4">
-                                        <div className="flex items-center">
-                                            <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
-                                                <div
-                                                    className={`h-2 rounded-full ${parseFloat(student.grade) >= 5.5 ? 'bg-green-500' : 'bg-red-500'}`}
-                                                    style={{ width: `${(student.totalScore / student.maxPossibleScore) * 100}%` }}
-                                                ></div>
-                                            </div>
-                                            <span className="text-xs whitespace-nowrap">{student.totalScore}/{student.maxPossibleScore}</span>
-                                        </div>
-                                    </td>
-                                </tr>
+
+                <table className="min-w-full">
+                    <thead className="sticky top-0 bg-white">
+                        <tr className="bg-gray-100 rounded-md">
+                            <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700 cursor-pointer" onClick={() => handleSort('name')}>Naam {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
+                            <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700 cursor-pointer" onClick={() => handleSort('grade')}>Cijfer {sortConfig.key === 'grade' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
+                            {/* <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700 cursor-pointer" onClick={() => handleSort('totalScore')}>Score {sortConfig.key === 'totalScore' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th> */}
+                            {/* RTTI columns */}
+                            {rttiCategories.map(cat => (
+                                <th key={cat} className="py-2 px-4 text-left text-sm font-semibold text-gray-700 cursor-pointer" onClick={() => handleSort(cat)}>
+                                    {cat} {sortConfig.key === cat && (sortConfig.direction === 'asc' ? '▲' : '▼')}
+                                </th>
                             ))}
-                        </tbody>
-                    </table>
-                </div>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {sortedStudents.map(student => (
+                            <tr
+                                key={student.id}
+                                className={`border-b hover:bg-gray-50 cursor-pointer transition-colors ${selectedStudent && selectedStudent.id === student.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''}`}
+                                onClick={() => setSelectedStudent(student)}
+                            >
+                                <td className="py-3 px-4">{student.name}</td>
+                                <td className="py-3 px-4">
+                                    <span className={`font-bold py-1 px-2 rounded-md text-white ${parseFloat(student.grade) >= 5.5 ? 'bg-green-500' : 'bg-red-500'}`}>{student.grade}</span>
+                                </td>
+                                {/* <td className="py-3 px-4">
+                                    <div className="flex items-center">
+                                        <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
+                                            <div
+                                                className={`h-2 rounded-full ${parseFloat(student.grade) >= 5.5 ? 'bg-green-500' : 'bg-red-500'}`}
+                                                style={{ width: `${(student.totalScore / student.maxPossibleScore) * 100}%` }}
+                                            ></div>
+                                        </div>
+                                        <span className="text-xs whitespace-nowrap">{student.totalScore}/{student.maxPossibleScore}</span>
+                                    </div>
+                                </td> */}
+                                {/* RTTI progress bars */}
+                                {rttiCategories.map(cat => {
+                                    const percent = getStudentRttiCorrect(student, cat);
+                                    return (
+                                        <td key={cat} className="py-3 px-4 min-w-[90px]">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                                    <div
+                                                        className="h-2 rounded-full"
+                                                        style={{ width: `${percent}%`, backgroundColor: rttiColors[cat] }}
+                                                    ></div>
+                                                </div>
+                                                <span className="text-xs font-medium">{percent}%</span>
+                                            </div>
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
             </div>
         );
     };
@@ -381,10 +442,10 @@ const RTTIDashboard = () => {
     const renderMainContent = () => {
         return (
             <div className="flex flex-col lg:flex-row gap-6">
-                <div className="lg:w-1/4 xl:w-1/5">
+                <div className="lg:w-1/2 xl:w-2/5">
                     {renderStudentTable()}
                 </div>
-                <div className="lg:w-3/4 xl:w-4/5">
+                <div className="lg:w-1/2 xl:w-3/5">
                     {renderQuestionGrid()}
                 </div>
             </div>
