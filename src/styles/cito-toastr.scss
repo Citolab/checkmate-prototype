@@ -1,0 +1,198 @@
+/* position */
+.toast-center-center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.toast-top-center {
+  top: 0;
+  right: 0;
+  width: 100%;
+}
+.toast-bottom-center {
+  bottom: 0;
+  right: 0;
+  width: 100%;
+}
+.toast-top-full-width {
+  top: 0;
+  right: 0;
+  width: 100%;
+}
+.toast-bottom-full-width {
+  bottom: 0;
+  right: 0;
+  width: 100%;
+}
+.toast-top-left {
+  top: var(--cito-sizes-grid-1);
+  left: var(--cito-sizes-grid-1);
+}
+.toast-top-right {
+  top: var(--cito-sizes-grid-1);
+  right: var(--cito-sizes-grid-1);
+}
+.toast-bottom-right {
+  right: var(--cito-sizes-grid-1);
+  bottom: var(--cito-sizes-grid-1);
+}
+.toast-bottom-left {
+  bottom: var(--cito-sizes-grid-1);
+  left: var(--cito-sizes-grid-1);
+}
+.toast-container {
+  pointer-events: none;
+  position: absolute;
+  z-index: 999999;
+}
+
+.ngx-toastr {
+  position: relative;
+  background-color: var(--cito-colors-grayscale-white);
+  border-radius: var(--cito-border-radius-sm);
+  border-left-style: solid;
+  border-left-width: 3px;
+  padding: var(--cito-sizes-grid-2) var(--cito-sizes-grid-2) var(--cito-sizes-grid-2) var(--cito-sizes-grid-8);
+  pointer-events: auto;
+  width: calc(50 * var(--cito-sizes-grid-1) - 3px);
+}
+
+.ngx-toastr:hover {
+  box-shadow: var(--cito-box-shadow);
+  opacity: 1;
+  cursor: pointer;
+}
+
+.toast-title {
+  font-family: var(--cito-font-family-bold);
+  line-height: var(--cito-sizes-grid-3);
+}
+
+.toast-message {
+  word-wrap: break-word;
+  line-height: var(--cito-sizes-grid-3);
+}
+
+.toast-close-button {
+  position: absolute;
+  display: inline-block;
+  font-family: var(--fa-style-family, "Font Awesome 6 Pro");
+  font-weight: var(--fa-style, 900);
+  font-size: var(--cito-font-size-xl);
+  content: '\f00d';
+  right: var(--cito-sizes-grid-1);
+  top: var(--cito-sizes-grid-1);
+  color: var(--cito-colors-grayscale-70);
+  border: none;
+  background-color: var(--cito-colors-grayscale-white);
+  cursor: pointer;
+}
+
+.toast-close-button:hover {
+  color: var(--cito-colors-grayscale-black);
+}
+
+.toast-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: var(--cito-border-bold);
+  opacity: 0.8;
+}
+
+.fa-toaster:before {
+  position: absolute;
+  height: var(--cito-sizes-grid-4);
+  width: var(--cito-sizes-grid-4);
+  top: var(--cito-sizes-grid-2);
+  left: var(--cito-sizes-grid-2);
+  font-family: var(--fa-style-family, "Font Awesome 6 Pro");
+  font-weight: var(--fa-style, 900);
+  font-size: var(--cito-font-size-lg);
+  line-height: var(--cito-sizes-grid-4);
+  border: 1px solid var(--cito-colors-grayscale-90);
+  border-radius: 50%;
+  text-align: center;
+}
+
+.toast-info {
+  border-left-color: var(--cito-colors-context-info-default);
+}
+.toast-info:before {
+  border-color: var(--cito-colors-context-info-default);
+  color: var(--cito-colors-context-info-default);
+  content: '\f129';
+}
+.toast-info .toast-progress {
+  background-color: var(--cito-colors-context-info-default);
+}
+
+.toast-info .toast-title {
+  color: var(--cito-colors-context-info-default);
+}
+
+.toast-error {
+  border-left-color: var(--cito-colors-context-danger-default);
+}
+.toast-error:before {
+  border-color: var(--cito-colors-context-danger-default);
+  color: var(--cito-colors-context-danger-default);
+  content: '\f00d'
+}
+.toast-error .toast-progress {
+  background-color: var(--cito-colors-context-danger-default);
+}
+
+.toast-error .toast-title {
+  color: var(--cito-colors-context-danger-default);
+}
+
+.toast-warning {
+  border-left-color: var(--cito-colors-context-warning-default);
+}
+.toast-warning:before {
+  border-color: var(--cito-colors-context-warning-default);
+  color: var(--cito-colors-context-warning-default);
+  content: '\21';
+}
+.toast-warning .toast-progress {
+  background-color: var(--cito-colors-context-warning-default);
+}
+
+.toast-warning .toast-title {
+  color: var(--cito-colors-context-warning-default);
+}
+
+
+.toast-success {
+  border-left-color: var(--cito-colors-context-success-default);
+}
+.toast-success:before {
+  border-color: var(--cito-colors-context-success-default);
+  color: var(--cito-colors-context-success-default);
+  content: '\f00c';
+}
+.toast-success .toast-progress {
+  background-color: var(--cito-colors-context-success-default);
+}
+
+.toast-success .toast-title {
+  color: var(--cito-colors-context-success-default);
+}
+
+
+.toast-default {
+  border-left-color: var(--cito-colors-grayscale-70);
+}
+.toast-default:before {
+  border-color: var(--cito-colors-grayscale-70);
+  color: var(--cito-colors-grayscale-70);
+  content: '\f013';
+}
+.toast-default .toast-progress {
+  background-color: var(--cito-colors-grayscale-70);
+}
+
+.toast-default .toast-title {
+  color: var(--cito-colors-grayscale-70);
+}

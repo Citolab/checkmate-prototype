@@ -13,7 +13,7 @@ export function HeaderBar(props) {
                         </svg>
                     </div>
                     <div className="flex">
-                        <a href="/nakijken" className={`cursor-pointer px-5 py-4 font-medium border-b-2 ${props.currentTab === 'nakijken' ? 'border-blue-600 text-blue-600' : 'border-transparent hover:border-gray-300'}`} onClick={() => props.setCurrentTab('nakijken')}>
+                        <a href="/" className={`cursor-pointer px-5 py-4 font-medium border-b-2 ${props.currentTab === 'nakijken' ? 'border-blue-600 text-blue-600' : 'border-transparent hover:border-gray-300'}`} onClick={() => props.setCurrentTab('nakijken')}>
                             Nakijken
                         </a>
                         <a href="/rapportage" className={`cursor-pointer px-5 py-4 font-medium border-b-2 ${props.currentTab === 'rapportage' ? 'border-blue-600 text-blue-600' : 'border-transparent hover:border-gray-300'}`} onClick={() => props.setCurrentTab('rapportage')}>

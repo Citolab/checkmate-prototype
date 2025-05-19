@@ -1,0 +1,42 @@
+
+h1, h2, h3, h4, h5 {
+  color: var(--cito-colors-grayscale-90);
+  font-family: var(--cito-font-family-bold);
+  font-weight: var(--cito-font-weight-normal);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+h1 {
+  font-size: var(--cito-font-size-xxl);
+  line-height: var(--cito-sizes-grid-4);
+}
+
+h2 {
+  font-size: var(--cito-font-size-xl);
+  line-height: var(--cito-sizes-grid-3);
+}
+
+h3 {
+  font-size: var(--cito-font-size-lg);
+  line-height: var(--cito-sizes-grid-3);
+}
+
+h4, h5 {
+  font-size: var(--cito-font-size-sm);
+  line-height: var(--cito-sizes-grid-2);
+}
+
+h4 {
+  text-transform: uppercase;
+  color: var(--cito-colors-grayscale-80);
+  letter-spacing: 0.48px;
+}
+  
+h4.cito-sub-title, h5.cito-sub-title {
+  color: var(--cito-colors-grayscale-80);
+  text-transform: uppercase;
+  letter-spacing: 4%;
+}
