@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { HeaderBar } from './components/HeaderBar';
 
 // RTTI Categories
@@ -128,9 +128,9 @@ const RTTIDashboard = () => {
     ).toFixed(1);
 
     const maxTotalScore = questions.reduce((sum, q) => sum + q.maxScore, 0);
-    const averageTotalScore = (
+    const averageTotalScore = parseFloat((
         students.reduce((sum, student) => sum + student.totalScore, 0) / students.length
-    ).toFixed(1);
+    ).toFixed(1));
     const averageScorePercentage = ((averageTotalScore / maxTotalScore) * 100).toFixed(1);
 
     // Color scheme for RTTI categories
@@ -318,7 +318,7 @@ const RTTIDashboard = () => {
                                 correct: false
                             };
 
-                        const scorePercentage = ((questionStats.score / question.maxScore) * 100).toFixed(0);
+                        const scorePercentage = parseFloat(((questionStats.score / question.maxScore) * 100).toFixed(0));
 
                         return (
                             <div

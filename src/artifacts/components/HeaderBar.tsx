@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function HeaderBar(props) {
     return (<header className="bg-white shadow-md sticky top-0 z-10 w-full">
         <div className="w-full px-4">
