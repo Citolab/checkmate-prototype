@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "checkmate-v3",
     "public": "dist",
     "ignore": [
       "firebase.json",
