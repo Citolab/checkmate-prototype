@@ -24,7 +24,7 @@ import {
 import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
 import { TooltipArrow, TooltipPortal } from "@radix-ui/react-tooltip";
 import { ChevronDown, CopyIcon } from "lucide-react";
-import AnnotateText from './components/AnnotateText';
+import TextAnnotationComponent from "./components/TextAnnotation";
 
 const AISuggestionPopup = ({
   question,
@@ -189,8 +189,8 @@ const ScoringSystem = () => {
   const [showAISuggestions, setShowAISuggestions] = useState(false); // Default uit
   const [hideScored, setHideScored] = useState(false); // Default uit
   const [visibleAIScores, setVisibleAIScores] = useState({}); // Voor individuele AI-scores
-      const [currentTab, setCurrentTab] = useState('nakijken');
-  
+  const [currentTab, setCurrentTab] = useState('nakijken');
+
   // Ref voor scrolling
   const rightColumnRef = useRef(null);
 
@@ -601,26 +601,22 @@ const ScoringSystem = () => {
                           <div className="flex items-center px-4 gap-2">
                             {/* <div className="flex flex-grow gap-2"> */}
 
-                            <CollapsibleTrigger
+                            <div
                               className={`flex flex-grow items-center gap-2 text-gray-800 ${safeHasOwnProperty(scores, answer.id) &&
                                 !hideScored
                                 ? "text-gray-500"
                                 : ""
                                 }`}
                             >
-                              <AnnotateText
-                                text={answer.text}
-                                onAnnotation={(selection, action, feedback) => {
-                                  console.log('Annotation:', { selection, action, feedback });
-                                  // Handle the annotation logic here
-                                }}
+                              <TextAnnotationComponent
+                                initialText={answer.text}
                               />
                               <div className="text-sm text-slate-400">{answer.frequency > 1 ? '×' + answer.frequency : ''}</div>
 
-                              <div className="flex items-center gap-1 text-gray-600 hover:text-gray-800 transition">
+                              <CollapsibleTrigger className="flex items-center gap-1 text-gray-600 hover:text-gray-800 transition">
                                 <ChevronDown className="w-4 h-4" />
-                              </div>
-                            </CollapsibleTrigger>
+                              </CollapsibleTrigger>
+                            </div>
                             {/* <CandidatePopover names={answer.names} /> */}
                             {/* </div> */}
                             <div className="flex items-center gap-2">
