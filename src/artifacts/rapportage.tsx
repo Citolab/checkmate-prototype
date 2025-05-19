@@ -10,21 +10,101 @@ const rttiFullNames = {
     'I': 'Inzicht'
 };
 
-// Generate random data for questions and students
+// Replace random question/answer generation with made-up biology questions and answers
+const biologyQuestions = [
+    {
+        title: 'Wat is de functie van de bladgroenkorrels in een plantencel?',
+        category: 'R',
+        maxScore: 2,
+        correctAnswer: 'Fotosynthese uitvoeren',
+    },
+    {
+        title: 'Noem twee verschillen tussen een dierlijke en een plantaardige cel.',
+        category: 'T1',
+        maxScore: 3,
+        correctAnswer: 'Plantaardige cellen hebben een celwand en bladgroenkorrels, dierlijke cellen niet',
+    },
+    {
+        title: 'Leg uit waarom water belangrijk is voor het transport in planten.',
+        category: 'I',
+        maxScore: 2,
+        correctAnswer: 'Water vervoert voedingsstoffen door de plant',
+    },
+    {
+        title: 'Wat gebeurt er bij de verbranding in cellen?',
+        category: 'T2',
+        maxScore: 2,
+        correctAnswer: 'Energie komt vrij uit glucose',
+    },
+    {
+        title: 'Welke organen zijn betrokken bij de spijsvertering?',
+        category: 'R',
+        maxScore: 3,
+        correctAnswer: 'Mond, slokdarm, maag, darmen',
+    },
+    {
+        title: 'Beschrijf het proces van gaswisseling in de longen.',
+        category: 'T1',
+        maxScore: 3,
+        correctAnswer: 'Zuurstof wordt opgenomen in het bloed, koolstofdioxide wordt afgegeven',
+    },
+    {
+        title: 'Waarom is biodiversiteit belangrijk voor een ecosysteem?',
+        category: 'I',
+        maxScore: 2,
+        correctAnswer: 'Het zorgt voor stabiliteit en veerkracht',
+    },
+    {
+        title: 'Geef een voorbeeld van een voedselketen.',
+        category: 'T2',
+        maxScore: 2,
+        correctAnswer: 'Gras → konijn → vos',
+    },
+    {
+        title: 'Wat is de rol van enzymen bij de spijsvertering?',
+        category: 'R',
+        maxScore: 2,
+        correctAnswer: 'Ze versnellen de afbraak van voedingsstoffen',
+    },
+    {
+        title: 'Leg uit wat adaptatie betekent bij dieren.',
+        category: 'I',
+        maxScore: 2,
+        correctAnswer: 'Aanpassing aan de omgeving',
+    },
+];
+
+const madeUpStudentAnswers = [
+    'Ze maken het blad groen',
+    'Planten hebben een celwand, dieren niet',
+    'Water zorgt dat de plant niet uitdroogt',
+    'Er komt energie vrij',
+    'Maag en darmen',
+    'Zuurstof gaat het bloed in',
+    'Dan kunnen dieren beter overleven',
+    'Plant → koe → mens',
+    'Ze helpen bij het verteren',
+    'Dieren passen zich aan',
+    'Ze zorgen voor fotosynthese',
+    'Dieren hebben geen bladgroenkorrels',
+    'Water is nodig voor groei',
+    'Glucose wordt verbrand',
+    'Slokdarm en maag',
+    'Koolstofdioxide eruit, zuurstof erin',
+    'Meer soorten is beter',
+    'Gras → schaap → wolf',
+    'Ze breken eten af',
+    'Aanpassen aan kou',
+];
+
 const generateRandomData = () => {
-    // Generate 20 questions with random RTTI categories and max scores
-    const questions = Array.from({ length: 20 }, (_, i) => {
-        const category = rttiCategories[Math.floor(Math.random() * rttiCategories.length)];
-        const maxScore = Math.floor(Math.random() * 4) + 1; // Random score between 1-4
-        return {
-            id: i + 1,
-            title: `Vraag ${i + 1}`,
-            category,
-            maxScore,
-            mostGivenAnswer: `Antwoord ${String.fromCharCode(65 + Math.floor(Math.random() * 4))}`,
-            correctPercentage: Math.floor(Math.random() * 50) + 50, // 50-100%
-        };
-    });
+    // Use biologyQuestions as the questions
+    const questions = biologyQuestions.map((q, i) => ({
+        ...q,
+        id: i + 1,
+        mostGivenAnswer: madeUpStudentAnswers[i % madeUpStudentAnswers.length],
+        correctPercentage: Math.floor(Math.random() * 50) + 50,
+    }));
 
     // Dutch names for students
     const dutchNames = [
@@ -34,30 +114,28 @@ const generateRandomData = () => {
         'Sofia Rodriguez', 'Sam de Groot', 'Noor van Leeuwen'
     ];
 
-    // Generate 15 students with random scores for each question
+    // Generate 15 students with made-up answers
     const students = dutchNames.map((name, i) => {
         let totalScore = 0;
         let maxPossibleScore = 0;
-
-        const questionScores = questions.map(question => {
+        const questionScores = questions.map((question, qIdx) => {
             // Random score between 0 and max score for the question
             const score = Math.floor(Math.random() * (question.maxScore + 1));
             totalScore += score;
             maxPossibleScore += question.maxScore;
-
+            // Pick a made-up answer
+            const answer = madeUpStudentAnswers[(i * 3 + qIdx) % madeUpStudentAnswers.length];
             return {
                 questionId: question.id,
                 score,
                 maxScore: question.maxScore,
-                answer: `Antwoord ${String.fromCharCode(65 + Math.floor(Math.random() * 4))}`,
+                answer,
                 correct: score === question.maxScore
             };
         });
-
         // Calculate grade (1-10 scale)
         const percentage = (totalScore / maxPossibleScore) * 100;
         const grade = Math.max(1, Math.min(10, (percentage / 100) * 9 + 1)).toFixed(1);
-
         return {
             id: i + 1,
             name,
@@ -67,7 +145,6 @@ const generateRandomData = () => {
             grade,
         };
     });
-
     return { questions, students };
 };
 
@@ -102,6 +179,48 @@ const calculateRttiStats = (questions, students) => {
     return rttiStats;
 };
 
+// New: StudentAnswers component
+const StudentAnswers = ({ student, questions, onBack }) => (
+    <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-gray-800">Antwoorden van {student.name}</h2>
+            <button
+                className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                onClick={onBack}
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                Terug naar klasoverzicht
+            </button>
+        </div>
+        <table className="min-w-full">
+            <thead>
+                <tr className="bg-gray-100">
+                    <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Vraag</th>
+                    <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Categorie</th>
+                    <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Score</th>
+                    <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Antwoord leerling</th>
+                    <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Goed antwoord</th>
+                </tr>
+            </thead>
+            <tbody>
+                {student.questionScores.map(qs => {
+                    const question = questions.find(q => q.id === qs.questionId);
+                    return (
+                        <tr key={qs.questionId} className="border-b">
+                            <td className="py-2 px-4">{question.title}</td>
+                            <td className="py-2 px-4">{question.category}</td>
+                            <td className="py-2 px-4">{qs.score} / {qs.maxScore}</td>
+                            <td className="py-2 px-4">{qs.answer}</td>
+                            <td className="py-2 px-4">{question.correctAnswer}</td>
+                        </tr>
+                    );
+                })}
+            </tbody>
+        </table>
+    </div>
+);
 
 const RTTIDashboard = () => {
     const [data, setData] = useState(null);
@@ -289,7 +408,6 @@ const RTTIDashboard = () => {
                         <tr className="bg-gray-100 rounded-md">
                             <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700 cursor-pointer" onClick={() => handleSort('name')}>Naam {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
                             <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700 cursor-pointer" onClick={() => handleSort('grade')}>Cijfer {sortConfig.key === 'grade' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
-                            {/* <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700 cursor-pointer" onClick={() => handleSort('totalScore')}>Score {sortConfig.key === 'totalScore' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th> */}
                             {/* RTTI columns */}
                             {rttiCategories.map(cat => (
                                 <th key={cat} className="py-2 px-4 text-left text-sm font-semibold text-gray-700 cursor-pointer" onClick={() => handleSort(cat)}>
@@ -309,17 +427,6 @@ const RTTIDashboard = () => {
                                 <td className="py-3 px-4">
                                     <span className={`font-bold py-1 px-2 rounded-md text-white ${parseFloat(student.grade) >= 5.5 ? 'bg-green-500' : 'bg-red-500'}`}>{student.grade}</span>
                                 </td>
-                                {/* <td className="py-3 px-4">
-                                    <div className="flex items-center">
-                                        <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
-                                            <div
-                                                className={`h-2 rounded-full ${parseFloat(student.grade) >= 5.5 ? 'bg-green-500' : 'bg-red-500'}`}
-                                                style={{ width: `${(student.totalScore / student.maxPossibleScore) * 100}%` }}
-                                            ></div>
-                                        </div>
-                                        <span className="text-xs whitespace-nowrap">{student.totalScore}/{student.maxPossibleScore}</span>
-                                    </div>
-                                </td> */}
                                 {/* RTTI progress bars */}
                                 {rttiCategories.map(cat => {
                                     const percent = getStudentRttiCorrect(student, cat);
@@ -440,6 +547,9 @@ const RTTIDashboard = () => {
     };
 
     const renderMainContent = () => {
+        if (selectedStudent) {
+            return <StudentAnswers student={selectedStudent} questions={questions} onBack={() => setSelectedStudent(null)} />;
+        }
         return (
             <div className="flex flex-col lg:flex-row gap-6">
                 <div className="lg:w-1/2 xl:w-2/5">
