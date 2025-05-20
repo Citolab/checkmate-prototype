@@ -197,10 +197,10 @@ const StudentAnswers = ({ student, questions, onBack }) => (
         <table className="min-w-full">
             <thead>
                 <tr className="bg-gray-100">
+                    <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Antwoorden leerling</th>
                     <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Vraag</th>
                     <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Categorie</th>
                     <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Score</th>
-                    <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Antwoord leerling</th>
                     <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Goed antwoord</th>
                 </tr>
             </thead>
@@ -209,10 +209,10 @@ const StudentAnswers = ({ student, questions, onBack }) => (
                     const question = questions.find(q => q.id === qs.questionId);
                     return (
                         <tr key={qs.questionId} className="border-b">
+                            <td className="py-2 px-4">{qs.answer}</td>
                             <td className="py-2 px-4">{question.title}</td>
                             <td className="py-2 px-4">{question.category}</td>
                             <td className="py-2 px-4">{qs.score} / {qs.maxScore}</td>
-                            <td className="py-2 px-4">{qs.answer}</td>
                             <td className="py-2 px-4">{question.correctAnswer}</td>
                         </tr>
                     );
@@ -432,14 +432,14 @@ const RTTIDashboard = () => {
                                     const percent = getStudentRttiCorrect(student, cat);
                                     return (
                                         <td key={cat} className="py-3 px-4 min-w-[90px]">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                            <div className="flex flex-col gap-2">
+                                                <div className="w-12  bg-gray-200 rounded-full h-2">
                                                     <div
                                                         className="h-2 rounded-full"
-                                                        style={{ width: `${percent}%`, backgroundColor: rttiColors[cat] }}
+                                                        style={{ width: `${percent}%`, backgroundColor: 'gray' }}
                                                     ></div>
                                                 </div>
-                                                <span className="text-xs font-medium">{percent}%</span>
+                                                <div className="text-xs font-medium text-gray-400">{percent}%</div>
                                             </div>
                                         </td>
                                     );
@@ -455,6 +455,7 @@ const RTTIDashboard = () => {
 
     const renderQuestionGrid = () => {
         return (
+
             <div className="bg-white rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-gray-800">
@@ -474,7 +475,7 @@ const RTTIDashboard = () => {
                     )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {questions.map(question => {
                         const questionStats = selectedStudent
                             ? selectedStudent.questionScores.find(qs => qs.questionId === question.id)
@@ -496,8 +497,7 @@ const RTTIDashboard = () => {
                                 <div className="flex justify-between items-start">
                                     <h3 className="font-bold">{question.title}</h3>
                                     <span
-                                        className="text-xs px-2 py-1 rounded-md text-white font-bold"
-                                        style={{ backgroundColor: rttiColors[question.category] }}
+                                        className="text-xs px-2 py-1 rounded-md text-white font-bold bg-gray-300"
                                     >
                                         {question.category}
                                     </span>
@@ -531,12 +531,6 @@ const RTTIDashboard = () => {
                                         </div>
                                     )}
 
-                                    {!selectedStudent && (
-                                        <div className="flex justify-between text-sm">
-                                            <span className="font-medium">% Correct:</span>
-                                            <span>{question.correctPercentage}%</span>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         );
@@ -547,16 +541,21 @@ const RTTIDashboard = () => {
     };
 
     const renderMainContent = () => {
-        if (selectedStudent) {
-            return <StudentAnswers student={selectedStudent} questions={questions} onBack={() => setSelectedStudent(null)} />;
-        }
+
         return (
             <div className="flex flex-col lg:flex-row gap-6">
                 <div className="lg:w-1/2 xl:w-2/5">
                     {renderStudentTable()}
                 </div>
                 <div className="lg:w-1/2 xl:w-3/5">
-                    {renderQuestionGrid()}
+                    {selectedStudent && <StudentAnswers student={selectedStudent} questions={questions} onBack={() => setSelectedStudent(null)} />}
+                    {!selectedStudent && (
+                        <div className="flex flex-col gap-6">
+                            {renderSummaryCards()}
+                            {renderRTTICards()}
+                            {renderQuestionGrid()}
+
+                        </div>)}
                 </div>
             </div>
         );
@@ -584,10 +583,10 @@ const RTTIDashboard = () => {
                 </div>
 
                 {/* Summary cards */}
-                {!selectedStudent && renderSummaryCards()}
+                {/* {!selectedStudent && renderSummaryCards()} */}
 
                 {/* RTTI Category Cards */}
-                {!selectedStudent && renderRTTICards()}
+                {/* {!selectedStudent && renderRTTICards()} */}
 
                 {/* Main content area - Student table and Question grid */}
                 <div className="mt-8">
