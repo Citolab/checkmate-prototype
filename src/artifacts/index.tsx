@@ -610,6 +610,26 @@ const ScoringSystem = () => {
                             >
                               <TextAnnotationComponent
                                 initialText={answer.text}
+                                annotations={answer.text.startsWith('vele verschillende') ? [
+                                  {
+                                    id: "abc123",
+                                    start: 19,
+                                    end: 28,
+                                    text: "kleuren",
+                                    comment: "Dit staat niet in de tekst, goed de vraag lezen",
+                                    visible: true
+                                  }
+                                ] : 
+                                answer.text.includes('bossen en heggen') ? [
+                                  {
+                                    id: "abc123",
+                                    start: answer.text.indexOf('bossen en heggen'),
+                                    end: answer.text.indexOf('bossen en heggen') + 'bossen en heggen'.length,
+                                    text: "bossen en heggen",
+                                    comment: "bossen en heggen zijn niet abiotische factoren",
+                                    visible: true
+                                  }
+                                ]: []}
                               />
                               <div className="text-sm text-slate-400">{answer.frequency > 1 ? '×' + answer.frequency : ''}</div>
 

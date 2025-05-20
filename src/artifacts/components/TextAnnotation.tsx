@@ -1,9 +1,12 @@
 import { useState, useRef, useCallback } from 'react';
 import { MessageCircle, Eye, EyeOff, Plus, X } from 'lucide-react';
 
-const TextAnnotationComponent = ({ initialText = "This is a sample text that you can annotate. Select any portion of this text to add comments and remarks. Click and drag to select text, then add your annotations. This component mimics Word's review mode functionality." }) => {
+const TextAnnotationComponent = ({ 
+    initialText = "This is a sample text that you can annotate. Select any portion of this text to add comments and remarks. Click and drag to select text, then add your annotations. This component mimics Word's review mode functionality.",
+    annotations: initialAnnotations = []
+}) => {
     const [text] = useState(initialText);
-    const [annotations, setAnnotations] = useState([]);
+    const [annotations, setAnnotations] = useState(initialAnnotations);
     const [showComments, setShowComments] = useState(true);
     const [selectedRange, setSelectedRange] = useState(null);
     const [newCommentText, setNewCommentText] = useState('');
@@ -215,7 +218,7 @@ const TextAnnotationComponent = ({ initialText = "This is a sample text that you
                 </div>
 
                 {/* Annotation summary */}
-                {annotations.length > 0 && (
+                {/* {annotations.length > 0 && (
                     <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                         <h3 className="text-lg font-semibold text-gray-800 mb-3">Annotations Summary</h3>
                         <div className="space-y-2">
@@ -238,7 +241,7 @@ const TextAnnotationComponent = ({ initialText = "This is a sample text that you
                             ))}
                         </div>
                     </div>
-                )}
+                )} */}
             </div>
             <button
                 onClick={() => setShowComments(!showComments)}
