@@ -377,8 +377,8 @@ const RTTIDashboard = () => {
                         <div key={stat.category} className="bg-gray-50 rounded-lg p-4 transition-all hover:shadow-md">
                             <div className="flex items-center">
                                 <div
-                                    className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mr-3 text-lg"
-                                    style={{ backgroundColor: rttiColors[stat.category] }}
+                                    className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mr-3 text-lg bg-gray-400"
+                                    // style={{ backgroundColor: rttiColors[stat.category] }}
                                 >
                                     {stat.category}
                                 </div>
@@ -396,10 +396,10 @@ const RTTIDashboard = () => {
                                 </div>
                                 <div className="w-full bg-gray-200 rounded-full h-4">
                                     <div
-                                        className="h-4 rounded-full transition-all duration-500"
+                                        className="h-4 rounded-full transition-all duration-500 bg-black"
                                         style={{
                                             width: `${stat.averagePercentage}%`,
-                                            backgroundColor: rttiColors[stat.category]
+                                            // backgroundColor: rttiColors[stat.category]
                                         }}
                                     ></div>
                                 </div>
