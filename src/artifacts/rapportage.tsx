@@ -17,60 +17,71 @@ const biologyQuestions = [
         category: 'R',
         maxScore: 2,
         correctAnswer: 'Fotosynthese uitvoeren',
+        rit: 0.82,
+
     },
     {
         title: 'Noem twee verschillen tussen een dierlijke en een plantaardige cel.',
         category: 'T1',
         maxScore: 3,
         correctAnswer: 'Plantaardige cellen hebben een celwand en bladgroenkorrels, dierlijke cellen niet',
+        rit: 0.74,
     },
     {
         title: 'Leg uit waarom water belangrijk is voor het transport in planten.',
         category: 'I',
         maxScore: 2,
         correctAnswer: 'Water vervoert voedingsstoffen door de plant',
+        rit: 0.65,
     },
     {
         title: 'Wat gebeurt er bij de verbranding in cellen?',
         category: 'T2',
         maxScore: 2,
         correctAnswer: 'Energie komt vrij uit glucose',
+        rit: 0.79,
     },
     {
         title: 'Welke organen zijn betrokken bij de spijsvertering?',
         category: 'R',
         maxScore: 3,
         correctAnswer: 'Mond, slokdarm, maag, darmen',
+        rit: 0.71,
     },
     {
         title: 'Beschrijf het proces van gaswisseling in de longen.',
         category: 'T1',
         maxScore: 3,
         correctAnswer: 'Zuurstof wordt opgenomen in het bloed, koolstofdioxide wordt afgegeven',
+        rit: 0.77,
     },
     {
         title: 'Waarom is biodiversiteit belangrijk voor een ecosysteem?',
         category: 'I',
         maxScore: 2,
         correctAnswer: 'Het zorgt voor stabiliteit en veerkracht',
+        rit: 0.69,
     },
     {
         title: 'Geef een voorbeeld van een voedselketen.',
         category: 'T2',
         maxScore: 2,
         correctAnswer: 'Gras → konijn → vos',
+        rit: 0.73,
     },
     {
         title: 'Wat is de rol van enzymen bij de spijsvertering?',
         category: 'R',
         maxScore: 2,
         correctAnswer: 'Ze versnellen de afbraak van voedingsstoffen',
+        rit: 0.81,
     },
     {
         title: 'Leg uit wat adaptatie betekent bij dieren.',
         category: 'I',
         maxScore: 2,
         correctAnswer: 'Aanpassing aan de omgeving',
+        rit: 0.68,
     },
 ];
 
@@ -227,6 +238,7 @@ const RTTIDashboard = () => {
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [currentTab, setCurrentTab] = useState('rapportage');
     const [sortConfig, setSortConfig] = useState({ key: 'grade', direction: 'desc' });
+    const [relativeBarWidth, setRelativeBarWidth] = useState(true);
 
     useEffect(() => {
         const generatedData = generateRandomData();
@@ -454,25 +466,26 @@ const RTTIDashboard = () => {
     };
 
     const renderQuestionGrid = () => {
+        // Find the max points for any question
+        const maxPoints = Math.max(...questions.map(q => q.maxScore));
         return (
-
             <div className="bg-white rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-gray-800">
                         {selectedStudent ? `Vragen - ${selectedStudent.name}` : 'Vragen - Klasgemiddelde'}
                     </h2>
-
-                    {selectedStudent && (
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">Relatieve breedte</span>
                         <button
-                            className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                            onClick={() => setSelectedStudent(null)}
+                            onClick={() => setRelativeBarWidth(v => !v)}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${relativeBarWidth ? "bg-blue-600" : "bg-gray-300"}`}
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M19 12H5M12 19l-7-7 7-7" />
-                            </svg>
-                            Terug naar klasoverzicht
+                            <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${relativeBarWidth ? "translate-x-6" : "translate-x-1"}`}
+                            />
                         </button>
-                    )}
+                        <span className="text-sm text-gray-600">Gelijke breedte</span>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -488,6 +501,9 @@ const RTTIDashboard = () => {
                             };
 
                         const scorePercentage = parseFloat(((questionStats.score / question.maxScore) * 100).toFixed(0));
+                        // Calculate width relative to maxPoints or fixed
+                        const barContainerWidth = relativeBarWidth ? 100 * (question.maxScore / maxPoints) : 100;
+                        const barFillWidth = (questionStats.score / question.maxScore) * barContainerWidth;
 
                         return (
                             <div
@@ -495,7 +511,14 @@ const RTTIDashboard = () => {
                                 className="bg-white rounded-lg border hover:shadow-md transition-shadow p-4"
                             >
                                 <div className="flex justify-between items-start">
+                                    <div className="flex flex-col gap-2">  
                                     <h3 className="font-bold">{question.title}</h3>
+                                    <span className="text-sm text-gray-500">{questionStats.answer}</span>
+                                    <div className="flex gap-4 mt-1 text-xs text-gray-500">
+                                        <span>RIT: <span className="font-semibold text-gray-700">{question.rit}</span></span>
+                                        <span>P-waarde: <span className="font-semibold text-gray-700">{(questionStats.score / question.maxScore).toFixed(2)}</span></span>
+                                    </div>
+                                    </div>
                                     <span
                                         className="text-xs px-2 py-1 rounded-md text-white font-bold bg-gray-300"
                                     >
@@ -510,19 +533,16 @@ const RTTIDashboard = () => {
                                             {selectedStudent ? `${questionStats.score} / ${question.maxScore}` : `Gem: ${questionStats.score} / ${question.maxScore}`}
                                         </span>
                                     </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-3">
+                                    <div className="w-full bg-gray-200 rounded-full h-3 relative" style={{ maxWidth: `${barContainerWidth}%` }}>
                                         <div
                                             className={`h-3 rounded-full ${scorePercentage > 70 ? 'bg-green-500' : scorePercentage > 40 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                                            style={{ width: `${scorePercentage}%` }}
+                                            style={{ width: `${barFillWidth}%` }}
                                         ></div>
                                     </div>
                                 </div>
 
                                 <div className="mt-4 space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="font-medium">Antwoord:</span>
-                                        <span>{questionStats.answer}</span>
-                                    </div>
+           
 
                                     {selectedStudent && (
                                         <div className={`flex justify-between text-sm ${questionStats.correct ? 'text-green-600' : 'text-red-600'}`}>
