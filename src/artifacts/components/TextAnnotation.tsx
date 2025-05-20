@@ -7,7 +7,7 @@ const TextAnnotationComponent = ({
 }) => {
     const [text] = useState(initialText);
     const [annotations, setAnnotations] = useState(initialAnnotations);
-    const [showComments, setShowComments] = useState(true);
+    const [showComments, setShowComments] = useState(false);
     const [selectedRange, setSelectedRange] = useState(null);
     const [newCommentText, setNewCommentText] = useState('');
     const [showNewCommentForm, setShowNewCommentForm] = useState(false);
@@ -16,6 +16,18 @@ const TextAnnotationComponent = ({
 
     // Generate unique ID for annotations
     const generateId = () => Math.random().toString(36).substr(2, 9);
+
+    // Show all comments
+    const showAllComments = () => {
+        setAnnotations(annotations.map(ann => ({ ...ann, visible: true })));
+        setShowComments(true);
+    };
+
+    // Hide all comments
+    const hideAllComments = () => {
+        setAnnotations(annotations.map(ann => ({ ...ann, visible: false })));
+        setShowComments(false);
+    };
 
     // Handle text selection
     const handleTextSelection = useCallback(() => {
@@ -26,7 +38,6 @@ const TextAnnotationComponent = ({
 
             if (containerElement && containerElement.contains(range.commonAncestorContainer)) {
                 // Calculate start and end positions relative to the text content
-                // const textContent = containerElement.textContent;
                 const beforeRange = range.cloneRange();
                 beforeRange.selectNodeContents(containerElement);
                 beforeRange.setEnd(range.startContainer, range.startOffset);
@@ -78,13 +89,6 @@ const TextAnnotationComponent = ({
         setAnnotations(annotations.filter(ann => ann.id !== id));
     };
 
-    // Toggle comment visibility
-    const toggleCommentVisibility = (id) => {
-        setAnnotations(annotations.map(ann =>
-            ann.id === id ? { ...ann, visible: !ann.visible } : ann
-        ));
-    };
-
     // Render annotated text
     const renderAnnotatedText = () => {
         const sortedAnnotations = [...annotations].sort((a, b) => a.start - b.start);
@@ -106,7 +110,11 @@ const TextAnnotationComponent = ({
                 <span
                     key={annotation.id}
                     className="relative bg-yellow-200 border-b-2 border-yellow-400 cursor-pointer hover:bg-yellow-300 transition-colors"
-                    onClick={() => toggleCommentVisibility(annotation.id)}
+                    onClick={() => {
+                        if (showComments) {
+                            setAnnotations(annotations.map(ann => ann.id === annotation.id ? { ...ann, visible: false } : ann));
+                        }
+                    }}
                     title={annotation.comment}
                 >
                     {annotation.text}
@@ -119,15 +127,28 @@ const TextAnnotationComponent = ({
                         >
                             <div className="flex items-start justify-between mb-2">
                                 <MessageCircle className="w-4 h-4 text-blue-500 mt-1" />
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        deleteAnnotation(annotation.id);
-                                    }}
-                                    className="text-gray-400 hover:text-red-500 transition-colors ml-2"
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
+                                <div className="flex gap-1">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setAnnotations(annotations.map(ann => ann.id === annotation.id ? { ...ann, visible: false } : ann));
+                                        }}
+                                        className="text-gray-400 hover:text-gray-700 transition-colors ml-2"
+                                        title="Close"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            deleteAnnotation(annotation.id);
+                                        }}
+                                        className="text-gray-400 hover:text-red-500 transition-colors ml-2"
+                                        title="Delete"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" /></svg>
+                                    </button>
+                                </div>
                             </div>
                             <p className="text-sm text-gray-700">{annotation.comment}</p>
                         </span>
@@ -147,17 +168,29 @@ const TextAnnotationComponent = ({
             );
         }
 
+        // Only show the show/hide comments button if there are annotations
+        if (annotations.length > 0) {
+            elements.push(
+                <button
+                    key="show-comments-btn"
+                    onClick={() => showComments ? hideAllComments() : showAllComments()}
+                    className={`ml-2 w-8 h-8 rounded-full flex items-center gap-2 p-2 transition-colors float-end ${showComments
+                        ? 'bg-blue-500 text-white hover:bg-blue-600'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                >
+                    {showComments ? <Eye className="w-6 h-6" /> : <EyeOff className="w-6 h-6" />}
+                    {/* {showComments ? 'Hide Comments' : 'Show Comments'} */}
+                </button>
+            );
+        }
+
         return elements;
     };
 
     return (
         <>
             <div>
-                {/* <span className="text-sm text-gray-500">
-                    {annotations.length} annotation{annotations.length !== 1 ? 's' : ''}
-                </span> */}
-
-
                 <div className="relative">
                     <div
                         ref={textContainerRef}
@@ -216,43 +249,7 @@ const TextAnnotationComponent = ({
                         </div>
                     )}
                 </div>
-
-                {/* Annotation summary */}
-                {/* {annotations.length > 0 && (
-                    <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-3">Annotations Summary</h3>
-                        <div className="space-y-2">
-                            {annotations.map((annotation) => (
-                                <div key={annotation.id} className="flex items-start gap-3 p-3 bg-white rounded border">
-                                    <MessageCircle className="w-4 h-4 text-blue-500 mt-1 flex-shrink-0" />
-                                    <div className="flex-1">
-                                        <div className="text-sm text-gray-600 mb-1">
-                                            "<span className="font-medium">{annotation.text}</span>"
-                                        </div>
-                                        <div className="text-sm text-gray-800">{annotation.comment}</div>
-                                    </div>
-                                    <button
-                                        onClick={() => deleteAnnotation(annotation.id)}
-                                        className="text-gray-400 hover:text-red-500 transition-colors"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )} */}
             </div>
-            <button
-                onClick={() => setShowComments(!showComments)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${showComments
-                    ? 'bg-blue-500 text-white hover:bg-blue-600'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
-            >
-                {showComments ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                {showComments ? 'Hide Comments' : 'Show Comments'}
-            </button>
         </>
     );
 };
