@@ -156,6 +156,8 @@ const generateRandomData = () => {
             grade,
         };
     });
+
+    console.log(JSON.stringify(students));
     return { questions, students };
 };
 
