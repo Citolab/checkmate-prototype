@@ -320,7 +320,7 @@ const RTTIDashboard = () => {
 
     const renderSummaryCards = () => {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 <div className="bg-white rounded-lg shadow-md p-6 transform hover:scale-105 transition-transform">
                     <h3 className="text-gray-500 font-medium mb-1">Gemiddeld cijfer</h3>
                     <div className="flex items-end">
@@ -350,20 +350,11 @@ const RTTIDashboard = () => {
                                 style={{ width: `${averageScorePercentage}%` }}
                             ></div>
                         </div>
+                        <div className='float-end mt-2'>{averageScorePercentage}%</div>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-lg shadow-md p-6 transform hover:scale-105 transition-transform">
-                    <h3 className="text-gray-500 font-medium mb-1">Percentage behaald</h3>
-                    <div className="flex items-end">
-                        <span className="text-5xl font-bold text-purple-600">{averageScorePercentage}%</span>
-                    </div>
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                        <div className="text-sm text-gray-600">
-                            Hoogste individuele score: {Math.max(...students.map(s => (s.totalScore / s.maxPossibleScore) * 100)).toFixed(1)}%
-                        </div>
-                    </div>
-                </div>
+                
             </div>
         );
     };

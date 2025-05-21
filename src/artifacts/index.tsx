@@ -620,7 +620,7 @@ const ScoringSystem = () => {
                                     visible: true
                                   }
                                 ] : 
-                                answer.text.includes('bossen en heggen') ? [
+                                answer.text.startsWith('bossen en heggen') ? [
                                   {
                                     id: "abc123",
                                     start: answer.text.indexOf('bossen en heggen'),
