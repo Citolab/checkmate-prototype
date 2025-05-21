@@ -2,11 +2,9 @@
   "hosting": {
     "site": "checkmate-v3",
     "public": "dist",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "predeploy": ["npm run build"],
+
     "rewrites": [
       {
         "source": "**",
