@@ -404,7 +404,7 @@ const ScoringSystem = () => {
               </div>
             </div>
 
-            {/* <div className="bg-gray-100 p-4 rounded-lg shadow-sm mb-4"> */}
+            {/* <div className="bg-gray-100 p-4 rounded-lg shadow-xs mb-4"> */}
             <div className="flex justify-between items-center mb-2">
               <div className="text-sm font-medium text-gray-700">
                 Voortgang beoordeling
@@ -435,7 +435,7 @@ const ScoringSystem = () => {
             {/* </div> */}
 
             {/* Antwoordmodel los bovenin */}
-            <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
+            <div className="bg-white p-4 rounded-lg shadow-xs mb-4">
               <div className="flex items-center gap-2 mb-4">
                 <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-500 text-white rounded-full text-xs font-bold">
                   ✓
@@ -447,7 +447,7 @@ const ScoringSystem = () => {
               </span>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm">
+            <div className="bg-white p-6 rounded-lg shadow-xs">
               <h2 className="text-xl font-bold text-gray-800 mb-4">
                 {question.title}
               </h2>
@@ -477,10 +477,10 @@ const ScoringSystem = () => {
             {/* Scrollbare antwoorden container */}
             <div className="pr-1">
               {/* Antwoordentabel zonder blauwe header */}
-              <div className="rounded-lg overflow-y-auto flex-grow relative">
+              <div className="rounded-lg overflow-y-auto grow relative">
                 {/* Kolomlabels */}
                 <div className="px-4 py-2 flex items-center justify-between">
-                  {/* <div className="flex-grow font-medium text-gray-700">Antwoord</div> */}
+                  {/* <div className="grow font-medium text-gray-700">Antwoord</div> */}
                   {/* <div className="w-32 text-center font-medium text-gray-700 mr-2">Score</div> */}
                   {/* <div className="w-20 text-center font-medium text-gray-700">AI</div> */}
                   {/* Toggle voor het verbergen van gescoorde antwoorden */}
@@ -490,7 +490,7 @@ const ScoringSystem = () => {
                     </span>
                     <button
                       onClick={toggleHideScored}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${hideScored ? "bg-blue-600" : "bg-gray-300"
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-hidden ${hideScored ? "bg-blue-600" : "bg-gray-300"
                         }`}
                     >
                       <span
@@ -506,7 +506,7 @@ const ScoringSystem = () => {
                     verbergen
                     <button
                       onClick={() => setShowAISuggestions(!showAISuggestions)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${showAISuggestions ? "bg-purple-600" : "bg-gray-300"
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-hidden ${showAISuggestions ? "bg-purple-600" : "bg-gray-300"
                         }`}
                     >
                       <span
@@ -599,10 +599,10 @@ const ScoringSystem = () => {
                           className={`border-t border-gray-100 flex flex-col bg-white py-2`}
                         >
                           <div className="flex items-center px-4 gap-2">
-                            {/* <div className="flex flex-grow gap-2"> */}
+                            {/* <div className="flex grow gap-2"> */}
 
                             <div
-                              className={`flex flex-grow items-center gap-2 text-gray-800 ${safeHasOwnProperty(scores, answer.id) &&
+                              className={`flex grow items-center gap-2 text-gray-800 ${safeHasOwnProperty(scores, answer.id) &&
                                 !hideScored
                                 ? "text-gray-500"
                                 : ""
@@ -732,7 +732,7 @@ const ScoringSystem = () => {
                                                 showAISuggestions ||
                                                 visibleAIScores[answer.id]
                                                 ? ""
-                                                : "blur-sm"
+                                                : "blur-xs"
                                                 }`}
                                             >
                                               {answer.aiScore}

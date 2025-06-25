@@ -226,7 +226,7 @@ const TextAnnotationComponent = ({
                                     value={newCommentText}
                                     onChange={(e) => setNewCommentText(e.target.value)}
                                     placeholder="Enter your comment..."
-                                    className="w-full p-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full p-2 border border-gray-300 rounded-md resize-none focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                                     rows={3}
                                     autoFocus
                                 />

@@ -471,7 +471,7 @@ const RTTIDashboard = () => {
                         <span className="text-sm text-gray-600">Relatieve breedte</span>
                         <button
                             onClick={() => setRelativeBarWidth(v => !v)}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${relativeBarWidth ? "bg-blue-600" : "bg-gray-300"}`}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-hidden ${relativeBarWidth ? "bg-blue-600" : "bg-gray-300"}`}
                         >
                             <span
                                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${relativeBarWidth ? "translate-x-6" : "translate-x-1"}`}
