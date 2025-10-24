@@ -1,5 +1,14 @@
 {
   "projects": {
-    "default": "ai-prototypes-3b724"
+    "default": "checkmate-citolab"
+  },
+  "targets": {
+    "checkmate-citolab": {
+      "hosting": {
+        "checkmate-demo-site": [
+          "checkmate-demo-site"
+        ]
+      }
+    }
   }
 }
