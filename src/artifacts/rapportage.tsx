@@ -1,13 +1,25 @@
 import { useState, useEffect } from 'react';
 import { HeaderBar } from './components/HeaderBar';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, ChevronUp, ChevronDown, Flag, Download, List, LayoutGrid } from 'lucide-react';
 
 // RTTI Categories
-const rttiCategories = ['R', 'T1', 'T2', 'I'];
-const rttiFullNames = {
+const rttiCategories = ['R', 'T1', 'T2', 'I'] as const;
+const rttiDescriptions: Record<string, string> = {
     'R': 'Reproductie',
-    'T1': 'Toepassingsniveau 1',
-    'T2': 'Toepassingsniveau 2',
+    'T1': 'Toepassing 1',
+    'T2': 'Toepassing 2',
     'I': 'Inzicht'
+};
+const rttiShort: Record<string, string> = {
+    'R': 'Repr',
+    'T1': 'T1',
+    'T2': 'T2',
+    'I': 'Inz'
 };
 
 // Replace random question/answer generation with made-up biology questions and answers
@@ -117,16 +129,27 @@ const generateRandomData = () => {
         correctPercentage: Math.floor(Math.random() * 50) + 50,
     }));
 
-    // Dutch names for students
+    // Dutch names for students (split into first/last)
     const dutchNames = [
-        'Sanne de Vries', 'Mohammed El Amrani', 'Daan Bakker', 'Fatima Yilmaz',
-        'Lieke van Dijk', 'Jayden Jansen', 'Fleur de Boer', 'Bram Visser',
-        'Aisha Özdemir', 'Thomas Mulder', 'Elin Zhang', 'Noah van der Meer',
-        'Sofia Rodriguez', 'Sam de Groot', 'Noor van Leeuwen'
+        { firstName: 'Mohamed', lastName: 'El Marani' },
+        { firstName: 'Aisha', lastName: 'Özdemir' },
+        { firstName: 'Noah', lastName: 'Van der Meer' },
+        { firstName: 'Noor', lastName: 'van Leeuwen' },
+        { firstName: 'Daan', lastName: 'Bakker' },
+        { firstName: 'Jayden', lastName: 'Jansen' },
+        { firstName: 'Sofia', lastName: 'Roderiquez' },
+        { firstName: 'Sam', lastName: 'de Groot' },
+        { firstName: 'Sanne', lastName: 'de Vries' },
+        { firstName: 'Thomas', lastName: 'Mulder' },
+        { firstName: 'Fatima', lastName: 'Yilmaz' },
+        { firstName: 'Mulder', lastName: 'Visser' },
+        { firstName: 'Bram', lastName: 'de Boer' },
+        { firstName: 'Fleur', lastName: 'Stoep' },
+        { firstName: 'Friso', lastName: 'Mulder' },
     ];
 
     // Generate 15 students with made-up answers
-    const students = dutchNames.map((name, i) => {
+    const students = dutchNames.map((nameObj, i) => {
         let totalScore = 0;
         let maxPossibleScore = 0;
         const questionScores = questions.map((question, qIdx) => {
@@ -149,7 +172,9 @@ const generateRandomData = () => {
         const grade = Math.max(1, Math.min(10, (percentage / 100) * 9 + 1)).toFixed(1);
         return {
             id: i + 1,
-            name,
+            firstName: nameObj.firstName,
+            lastName: nameObj.lastName,
+            name: `${nameObj.firstName} ${nameObj.lastName}`,
             questionScores,
             totalScore,
             maxPossibleScore,
@@ -159,78 +184,94 @@ const generateRandomData = () => {
     return { questions, students };
 };
 
-// Calculate RTTI statistics
-const calculateRttiStats = (questions, students) => {
-    const rttiStats = rttiCategories.map(category => {
-        const categoryQuestions = questions.filter(q => q.category === category);
-        const maxPossibleScore = categoryQuestions.reduce((sum, q) => sum + q.maxScore, 0);
-
-        const totalStudentScores = students.reduce((sum, student) => {
-            const categoryScores = student.questionScores.filter(qs =>
-                categoryQuestions.some(q => q.id === qs.questionId)
-            );
-            return sum + categoryScores.reduce((qSum, qs) => qSum + qs.score, 0);
-        }, 0);
-
-        const averageScore = totalStudentScores / students.length;
-        const averagePercentage = maxPossibleScore > 0
-            ? (averageScore / maxPossibleScore) * 100
-            : 0;
-
-        return {
-            category,
-            fullName: rttiFullNames[category],
-            questionCount: categoryQuestions.length,
-            maxPossibleScore,
-            averageScore: averageScore.toFixed(1),
-            averagePercentage: averagePercentage.toFixed(1),
-        };
-    });
-
-    return rttiStats;
-};
-
 // New: StudentAnswers component
-const StudentAnswers = ({ student, questions, onBack }) => (
-    <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-800">Antwoorden van {student.name}</h2>
-            <button
-                className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                onClick={onBack}
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                Terug naar klasoverzicht
-            </button>
-        </div>
-        <table className="min-w-full">
-            <thead>
-                <tr className="bg-gray-100">
-                    <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Antwoorden leerling</th>
-                    <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Vraag</th>
-                    <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Categorie</th>
-                    <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Score</th>
-                    <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700">Goed antwoord</th>
-                </tr>
-            </thead>
-            <tbody>
-                {student.questionScores.map(qs => {
-                    const question = questions.find(q => q.id === qs.questionId);
-                    return (
-                        <tr key={qs.questionId} className="border-b">
-                            <td className="py-2 px-4">{qs.answer}</td>
-                            <td className="py-2 px-4">{question.title}</td>
-                            <td className="py-2 px-4">{question.category}</td>
-                            <td className="py-2 px-4">{qs.score} / {qs.maxScore}</td>
-                            <td className="py-2 px-4">{question.correctAnswer}</td>
-                        </tr>
-                    );
-                })}
-            </tbody>
-        </table>
-    </div>
+const StudentAnswers = ({ student, questions, onBack, compactView, setCompactView }) => (
+    <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle>Antwoorden van {student.name}</CardTitle>
+            <div className="flex items-center gap-2">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCompactView(prev => !prev)}
+                    className="gap-1"
+                >
+                    {compactView ? <LayoutGrid className="h-4 w-4" /> : <List className="h-4 w-4" />}
+                    {compactView ? 'Uitgebreid' : 'Compact'}
+                </Button>
+                <Button variant="outline" onClick={onBack} className="gap-2">
+                    <ArrowLeft className="h-4 w-4" />
+                    Terug
+                </Button>
+            </div>
+        </CardHeader>
+        <CardContent>
+            {compactView ? (
+                // Compact view: just answers and scores
+                <div className="space-y-2">
+                    {student.questionScores.map((qs, index) => {
+                        const isCorrect = qs.score === qs.maxScore;
+                        return (
+                            <div key={qs.questionId} className="flex items-center justify-between py-2 border-b last:border-b-0">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-sm text-muted-foreground w-6">{index + 1}.</span>
+                                    <span className="text-sm">{qs.answer}</span>
+                                </div>
+                                <Badge 
+                                    variant="secondary" 
+                                    className={`font-bold ${isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}
+                                >
+                                    {qs.score}/{qs.maxScore}
+                                </Badge>
+                            </div>
+                        );
+                    })}
+                </div>
+            ) : (
+                // Full view: thumbnail, question, rubric, RTTI
+                <div className="space-y-3">
+                    {student.questionScores.map((qs, index) => {
+                        const question = questions.find(q => q.id === qs.questionId);
+                        const isCorrect = qs.score === qs.maxScore;
+                        return (
+                            <div key={qs.questionId} className="flex gap-4 border rounded-lg overflow-hidden">
+                                {/* Question thumbnail placeholder with RTTI badge overlay */}
+                                <div className="flex-shrink-0 w-40 aspect-video bg-muted flex items-center justify-center relative">
+                                    <Badge variant="secondary" className="absolute top-2 left-2 text-xs font-normal">
+                                        {rttiShort[question.category]}
+                                    </Badge>
+                                    <span className="text-3xl font-bold text-muted-foreground">{index + 1}</span>
+                                </div>
+                                <div className="flex-1 p-3">
+                                    <h4 className="font-medium text-sm mb-2">{question.title}</h4>
+                                    <div className="space-y-1 text-sm">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs text-muted-foreground">Antwoord:</span>
+                                            <span className={isCorrect ? 'text-green-600' : 'text-foreground'}>
+                                                {qs.answer}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs text-muted-foreground">Rubric:</span>
+                                            <span className="text-green-600">{question.correctAnswer}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex-shrink-0 p-3 flex items-start">
+                                    <Badge 
+                                        variant="secondary" 
+                                        className={`font-bold ${isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}
+                                    >
+                                        {qs.score}/{qs.maxScore}
+                                    </Badge>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+        </CardContent>
+    </Card>
 );
 
 const RTTIDashboard = () => {
@@ -238,40 +279,27 @@ const RTTIDashboard = () => {
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [currentTab, setCurrentTab] = useState('rapportage');
     const [sortConfig, setSortConfig] = useState({ key: 'grade', direction: 'desc' });
-    const [relativeBarWidth, setRelativeBarWidth] = useState(true);
+    const [questionSortKey, setQuestionSortKey] = useState('rit');
+    const [questionSortDir, setQuestionSortDir] = useState<'asc' | 'desc'>('desc');
+    const [compactView, setCompactView] = useState(false);
 
     useEffect(() => {
         const generatedData = generateRandomData();
-        const rttiStats = calculateRttiStats(generatedData.questions, generatedData.students);
-
-        setData({
-            ...generatedData,
-            rttiStats,
-        });
+        setData(generatedData);
     }, []);
 
-    if (!data) return <div className="flex justify-center items-center h-screen">Laden...</div>;
+    if (!data) return (
+        <div className="flex justify-center items-center h-screen">
+            <div className="text-muted-foreground">Laden...</div>
+        </div>
+    );
 
-    const { questions, students, rttiStats } = data;
+    const { questions, students } = data;
 
     // Calculate averages
     const averageGrade = (
         students.reduce((sum, student) => sum + parseFloat(student.grade), 0) / students.length
     ).toFixed(1);
-
-    const maxTotalScore = questions.reduce((sum, q) => sum + q.maxScore, 0);
-    const averageTotalScore = parseFloat((
-        students.reduce((sum, student) => sum + student.totalScore, 0) / students.length
-    ).toFixed(1));
-    const averageScorePercentage = ((averageTotalScore / maxTotalScore) * 100).toFixed(1);
-
-    // Color scheme for RTTI categories
-    const rttiColors = {
-        'R': '#4169E1', // Royal Blue
-        'T1': '#FF6347', // Tomato
-        'T2': '#32CD32', // Lime Green
-        'I': '#FFD700'  // Gold
-    };
 
     // Helper: Calculate RTTI correct percentage for a student
     const getStudentRttiCorrect = (student, category) => {
@@ -298,9 +326,9 @@ const RTTIDashboard = () => {
         } else if (key === 'totalScore') {
             aValue = a.totalScore;
             bValue = b.totalScore;
-        } else if (key === 'name') {
-            aValue = a.name.toLowerCase();
-            bValue = b.name.toLowerCase();
+        } else if (key === 'firstName' || key === 'lastName') {
+            aValue = a[key].toLowerCase();
+            bValue = b[key].toLowerCase();
         }
         if (aValue < bValue) return direction === 'asc' ? -1 : 1;
         if (aValue > bValue) return direction === 'asc' ? 1 : -1;
@@ -316,302 +344,358 @@ const RTTIDashboard = () => {
         });
     };
 
-    const renderSummaryCards = () => {
-        return (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <div className="bg-white rounded-lg shadow-md p-6 transform hover:scale-105 transition-transform">
-                    <h3 className="text-gray-500 font-medium mb-1">Gemiddeld cijfer</h3>
-                    <div className="flex items-end">
-                        <span className="text-5xl font-bold text-blue-600">{averageGrade}</span>
-                        <span className="text-gray-500 ml-2 mb-1">/ 10</span>
-                    </div>
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                        <div className="text-sm text-gray-600">
-                            {parseFloat(averageGrade) >= 5.5 ?
-                                `${Math.round((students.filter(s => parseFloat(s.grade) >= 5.5).length / students.length) * 100)}% voldoendes` :
-                                `${Math.round((students.filter(s => parseFloat(s.grade) < 5.5).length / students.length) * 100)}% onvoldoendes`
-                            }
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-white rounded-lg shadow-md p-6 transform hover:scale-105 transition-transform">
-                    <h3 className="text-gray-500 font-medium mb-1">Gemiddelde score</h3>
-                    <div className="flex items-end">
-                        <span className="text-5xl font-bold text-green-600">{averageTotalScore}</span>
-                        <span className="text-gray-500 ml-2 mb-1">/ {maxTotalScore} punten</span>
-                    </div>
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                                className="bg-green-600 h-2 rounded-full"
-                                style={{ width: `${averageScorePercentage}%` }}
-                            ></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-white rounded-lg shadow-md p-6 transform hover:scale-105 transition-transform">
-                    <h3 className="text-gray-500 font-medium mb-1">Percentage behaald</h3>
-                    <div className="flex items-end">
-                        <span className="text-5xl font-bold text-purple-600">{averageScorePercentage}%</span>
-                    </div>
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                        <div className="text-sm text-gray-600">
-                            Hoogste individuele score: {Math.max(...students.map(s => (s.totalScore / s.maxPossibleScore) * 100)).toFixed(1)}%
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-    const renderRTTICards = () => {
-        return (
-            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">RTTI Categorieën</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-                    {rttiStats.map(stat => (
-                        <div key={stat.category} className="bg-gray-50 rounded-lg p-4 transition-all hover:shadow-md">
-                            <div className="flex items-center">
-                                <div
-                                    className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mr-3 text-lg"
-                                    style={{ backgroundColor: rttiColors[stat.category] }}
-                                >
-                                    {stat.category}
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-lg">{stat.fullName}</h3>
-                                    <p className="text-sm text-gray-600 font-medium">
-                                        {stat.questionCount} {stat.questionCount === 1 ? 'vraag' : 'vragen'}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="mt-4">
-                                <div className="flex justify-between mb-1">
-                                    <span className="text-sm">Gemiddelde score:</span>
-                                    <span className="text-sm font-bold">{stat.averageScore} / {stat.maxPossibleScore}</span>
-                                </div>
-                                <div className="w-full bg-gray-200 rounded-full h-4">
-                                    <div
-                                        className="h-4 rounded-full transition-all duration-500"
-                                        style={{
-                                            width: `${stat.averagePercentage}%`,
-                                            backgroundColor: rttiColors[stat.category]
-                                        }}
-                                    ></div>
-                                </div>
-                                <p className="text-sm mt-1 text-right font-semibold">{stat.averagePercentage}%</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
-    };
-
     const renderStudentTable = () => {
+        const SortIcon = ({ columnKey }: { columnKey: string }) => {
+            if (sortConfig.key !== columnKey) return null;
+            return sortConfig.direction === 'asc' ? 
+                <ChevronUp className="h-3 w-3 inline ml-1" /> : 
+                <ChevronDown className="h-3 w-3 inline ml-1" />;
+        };
+
+        // Calculate class averages for RTTI categories
+        const classAverages = rttiCategories.reduce((acc, cat) => {
+            const total = students.reduce((sum, student) => sum + getStudentRttiCorrect(student, cat), 0);
+            acc[cat] = Math.round(total / students.length);
+            return acc;
+        }, {} as Record<string, number>);
+
         return (
-            <div className="bg-white rounded-lg shadow-md p-4 h-full">
-                <h2 className="text-lg font-bold mb-4 text-gray-800">Leerlingen</h2>
-
-                <table className="min-w-full">
-                    <thead className="sticky top-0 bg-white">
-                        <tr className="bg-gray-100 rounded-md">
-                            <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700 cursor-pointer" onClick={() => handleSort('name')}>Naam {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
-                            <th className="py-2 px-4 text-left text-sm font-semibold text-gray-700 cursor-pointer" onClick={() => handleSort('grade')}>Cijfer {sortConfig.key === 'grade' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
-                            {/* RTTI columns */}
-                            {rttiCategories.map(cat => (
-                                <th key={cat} className="py-2 px-4 text-left text-sm font-semibold text-gray-700 cursor-pointer" onClick={() => handleSort(cat)}>
-                                    {cat} {sortConfig.key === cat && (sortConfig.direction === 'asc' ? '▲' : '▼')}
-                                </th>
+            <Card className="h-full">
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">Leerlingen</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="text-xs">
+                                <TableHead 
+                                    className="cursor-pointer hover:bg-muted/50 py-2 px-2 w-16" 
+                                    onClick={() => handleSort('grade')}
+                                >
+                                    Cijfer <SortIcon columnKey="grade" />
+                                </TableHead>
+                                <TableHead 
+                                    className="cursor-pointer hover:bg-muted/50 py-2 px-3" 
+                                    onClick={() => handleSort('firstName')}
+                                >
+                                    Voornaam <SortIcon columnKey="firstName" />
+                                </TableHead>
+                                <TableHead 
+                                    className="cursor-pointer hover:bg-muted/50 py-2 px-3" 
+                                    onClick={() => handleSort('lastName')}
+                                >
+                                    Achternaam <SortIcon columnKey="lastName" />
+                                </TableHead>
+                                <TableHead className="w-full" />
+                                {rttiCategories.map(cat => (
+                                    <TableHead 
+                                        key={cat} 
+                                        className="cursor-pointer hover:bg-muted/50 py-2 px-1 whitespace-nowrap" 
+                                        onClick={() => handleSort(cat)}
+                                    >
+                                        {rttiDescriptions[cat]} <SortIcon columnKey={cat} />
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {/* Klasgemiddelde row */}
+                            <TableRow className="bg-muted/30 font-medium">
+                                <TableCell className="py-2 px-2">
+                                    <span className="text-primary font-bold">{averageGrade}</span>
+                                </TableCell>
+                                <TableCell className="py-2 px-3" colSpan={2}>Klasgemiddelde</TableCell>
+                                <TableCell />
+                                {rttiCategories.map(cat => (
+                                    <TableCell key={cat} className="py-2 px-1">
+                                        <Progress value={classAverages[cat]} className="h-2 w-12" />
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                            {sortedStudents.map(student => (
+                                <TableRow
+                                    key={student.id}
+                                    className={`cursor-pointer ${selectedStudent && selectedStudent.id === student.id ? 'bg-primary/10' : ''}`}
+                                    onClick={() => {
+                                        setSelectedStudent(student);
+                                        setTimeout(() => {
+                                            document.getElementById('student-answers')?.scrollIntoView({ behavior: 'smooth' });
+                                        }, 100);
+                                    }}
+                                >
+                                    <TableCell className="py-2 px-2">
+                                        <Badge 
+                                            variant="secondary" 
+                                            className={`font-bold px-2 py-0.5 ${
+                                                parseFloat(student.grade) >= 6 
+                                                    ? 'bg-green-100 text-green-700 hover:bg-green-100' 
+                                                    : parseFloat(student.grade) >= 5 
+                                                        ? 'bg-orange-100 text-orange-600 hover:bg-orange-100' 
+                                                        : 'bg-red-100 text-red-600 hover:bg-red-100'
+                                            }`}
+                                        >
+                                            {student.grade}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="py-2 px-3">{student.firstName}</TableCell>
+                                    <TableCell className="py-2 px-3">{student.lastName}</TableCell>
+                                    <TableCell />
+                                    {rttiCategories.map(cat => {
+                                        const percent = getStudentRttiCorrect(student, cat);
+                                        return (
+                                            <TableCell key={cat} className="py-2 px-1">
+                                                <Progress value={percent} className="h-2 w-12" />
+                                            </TableCell>
+                                        );
+                                    })}
+                                </TableRow>
                             ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {sortedStudents.map(student => (
-                            <tr
-                                key={student.id}
-                                className={`border-b hover:bg-gray-50 cursor-pointer transition-colors ${selectedStudent && selectedStudent.id === student.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''}`}
-                                onClick={() => setSelectedStudent(student)}
-                            >
-                                <td className="py-3 px-4">{student.name}</td>
-                                <td className="py-3 px-4">
-                                    <span className={`font-bold py-1 px-2 rounded-md text-white ${parseFloat(student.grade) >= 5.5 ? 'bg-green-500' : 'bg-red-500'}`}>{student.grade}</span>
-                                </td>
-                                {/* RTTI progress bars */}
-                                {rttiCategories.map(cat => {
-                                    const percent = getStudentRttiCorrect(student, cat);
-                                    return (
-                                        <td key={cat} className="py-3 px-4 min-w-[90px]">
-                                            <div className="flex flex-col gap-2">
-                                                <div className="w-12  bg-gray-200 rounded-full h-2">
-                                                    <div
-                                                        className="h-2 rounded-full"
-                                                        style={{ width: `${percent}%`, backgroundColor: 'gray' }}
-                                                    ></div>
-                                                </div>
-                                                <div className="text-xs font-medium text-gray-400">{percent}%</div>
-                                            </div>
-                                        </td>
-                                    );
-                                })}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-
-            </div>
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
         );
     };
 
-    const renderQuestionGrid = () => {
-        // Find the max points for any question
-        const maxPoints = Math.max(...questions.map(q => q.maxScore));
+    const renderQuestionList = () => {
+        // Calculate average scores for each question
+        const questionsWithStats = questions.map(question => {
+            const avgScore = students.reduce((sum, s) =>
+                sum + s.questionScores.find(qs => qs.questionId === question.id).score, 0
+            ) / students.length;
+            const pValue = avgScore / question.maxScore;
+            return {
+                ...question,
+                avgScore,
+                pValue
+            };
+        });
+
+        // Sort questions based on selected sort option
+        const sortedQuestions = [...questionsWithStats].sort((a, b) => {
+            let aVal, bVal;
+            switch (questionSortKey) {
+                case 'order':
+                    aVal = a.id;
+                    bVal = b.id;
+                    break;
+                case 'rit':
+                    aVal = a.rit;
+                    bVal = b.rit;
+                    break;
+                case 'pvalue':
+                    aVal = a.pValue;
+                    bVal = b.pValue;
+                    break;
+                case 'score':
+                    aVal = a.avgScore;
+                    bVal = b.avgScore;
+                    break;
+                default:
+                    return 0;
+            }
+            return questionSortDir === 'desc' ? bVal - aVal : aVal - bVal;
+        });
+
+        const handleSortClick = (key: string) => {
+            if (key === 'order') {
+                // Order always sorts ascending (1 to 10)
+                setQuestionSortKey('order');
+                setQuestionSortDir('asc');
+            } else if (questionSortKey === key) {
+                setQuestionSortDir(prev => prev === 'desc' ? 'asc' : 'desc');
+            } else {
+                setQuestionSortKey(key);
+                setQuestionSortDir('desc');
+            }
+        };
+
+        // Descriptive labels for sort buttons based on direction
+        const getSortLabel = (key: string) => {
+            const isActive = questionSortKey === key;
+            const dir = isActive ? questionSortDir : 'desc';
+            
+            const labels = {
+                order: {
+                    desc: 'Volgorde in toets',
+                    asc: 'Volgorde in toets'
+                },
+                rit: {
+                    desc: 'Meest onderscheidend',
+                    asc: 'Minst onderscheidend'
+                },
+                pvalue: {
+                    desc: 'Makkelijkste vragen',
+                    asc: 'Moeilijkste vragen'
+                },
+                score: {
+                    desc: 'Best gescoord',
+                    asc: 'Slechtst gescoord'
+                }
+            };
+            
+            return labels[key]?.[dir] || key;
+        };
+
+        const SortButton = ({ sortKey }: { sortKey: string }) => (
+            <Button
+                variant={questionSortKey === sortKey ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => handleSortClick(sortKey)}
+                className="gap-1"
+            >
+                {getSortLabel(sortKey)}
+                {questionSortKey === sortKey && sortKey !== 'order' && (
+                    questionSortDir === 'desc' ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />
+                )}
+            </Button>
+        );
+
         return (
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-gray-800">
-                        {selectedStudent ? `Vragen - ${selectedStudent.name}` : 'Vragen - Klasgemiddelde'}
-                    </h2>
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600">Relatieve breedte</span>
-                        <button
-                            onClick={() => setRelativeBarWidth(v => !v)}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${relativeBarWidth ? "bg-blue-600" : "bg-gray-300"}`}
-                        >
-                            <span
-                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${relativeBarWidth ? "translate-x-6" : "translate-x-1"}`}
-                            />
-                        </button>
-                        <span className="text-sm text-gray-600">Gelijke breedte</span>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                    {questions.map(question => {
-                        const questionStats = selectedStudent
-                            ? selectedStudent.questionScores.find(qs => qs.questionId === question.id)
-                            : {
-                                score: (students.reduce((sum, s) =>
-                                    sum + s.questionScores.find(qs => qs.questionId === question.id).score, 0
-                                ) / students.length).toFixed(1),
-                                answer: question.mostGivenAnswer,
-                                correct: false
-                            };
-
-                        const scorePercentage = parseFloat(((questionStats.score / question.maxScore) * 100).toFixed(0));
-                        // Calculate width relative to maxPoints or fixed
-                        const barContainerWidth = relativeBarWidth ? 100 * (question.maxScore / maxPoints) : 100;
-                        const barFillWidth = (questionStats.score / question.maxScore) * barContainerWidth;
-
-                        return (
-                            <div
-                                key={question.id}
-                                className="bg-white rounded-lg border hover:shadow-md transition-shadow p-4"
+            <Card>
+                <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg">Vragen</CardTitle>
+                        <div className="flex items-center gap-2">
+                            <SortButton sortKey="order" />
+                            <SortButton sortKey="rit" />
+                            <SortButton sortKey="pvalue" />
+                            <SortButton sortKey="score" />
+                            <div className="w-px h-6 bg-border mx-1" />
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCompactView(prev => !prev)}
+                                className="gap-1"
                             >
-                                <div className="flex justify-between items-start">
-                                    <div className="flex flex-col gap-2">  
-                                    <h3 className="font-bold">{question.title}</h3>
-                                    <span className="text-sm text-gray-500">{questionStats.answer}</span>
-                                    <div className="flex gap-4 mt-1 text-xs text-gray-500">
-                                        <span>RIT: <span className="font-semibold text-gray-700">{question.rit}</span></span>
-                                        <span>P-waarde: <span className="font-semibold text-gray-700">{(questionStats.score / question.maxScore).toFixed(2)}</span></span>
-                                    </div>
-                                    </div>
-                                    <span
-                                        className="text-xs px-2 py-1 rounded-md text-white font-bold bg-gray-300"
-                                    >
-                                        {question.category}
-                                    </span>
-                                </div>
-
-                                <div className="mt-4">
-                                    <div className="flex justify-between mb-1">
-                                        <span className="text-sm">Score:</span>
-                                        <span className="text-sm font-bold">
-                                            {selectedStudent ? `${questionStats.score} / ${question.maxScore}` : `Gem: ${questionStats.score} / ${question.maxScore}`}
-                                        </span>
-                                    </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-3 relative" style={{ maxWidth: `${barContainerWidth}%` }}>
-                                        <div
-                                            className={`h-3 rounded-full ${scorePercentage > 70 ? 'bg-green-500' : scorePercentage > 40 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                                            style={{ width: `${barFillWidth}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-4 space-y-2">
-           
-
-                                    {selectedStudent && (
-                                        <div className={`flex justify-between text-sm ${questionStats.correct ? 'text-green-600' : 'text-red-600'}`}>
-                                            <span className="font-medium">Status:</span>
-                                            <span>{questionStats.correct ? '✓ Correct' : '✗ Incorrect'}</span>
+                                {compactView ? <LayoutGrid className="h-4 w-4" /> : <List className="h-4 w-4" />}
+                                {compactView ? 'Uitgebreid' : 'Compact'}
+                            </Button>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    {compactView ? (
+                        // Compact view: minimal list
+                        <div className="space-y-2">
+                            {sortedQuestions.map((question) => {
+                                const scorePercentage = Math.round(question.pValue * 100);
+                                return (
+                                    <div key={question.id} className="flex items-center justify-between py-2 border-b last:border-b-0">
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-sm text-muted-foreground w-6">{question.id}.</span>
+                                            <Badge variant="outline" className="text-xs font-normal">{rttiShort[question.category]}</Badge>
                                         </div>
-                                    )}
+                                        <div className="flex items-center gap-4 text-xs">
+                                            <span>RIT: <span className="font-medium">{question.rit}</span></span>
+                                            <span>P: <span className="font-medium">{question.pValue.toFixed(2)}</span></span>
+                                            <Badge 
+                                                variant="secondary" 
+                                                className={`font-bold ${scorePercentage > 70 ? 'bg-green-100 text-green-700' : scorePercentage > 40 ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-600'}`}
+                                            >
+                                                {question.avgScore.toFixed(1)}/{question.maxScore}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        // Full view: thumbnail, question, RTTI
+                        <div className="space-y-3">
+                            {sortedQuestions.map((question) => {
+                                const scorePercentage = Math.round(question.pValue * 100);
 
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
+                                return (
+                                    <div key={question.id} className="flex gap-4 border rounded-lg overflow-hidden">
+                                        {/* Question thumbnail placeholder with RTTI badge overlay */}
+                                        <div className="flex-shrink-0 w-40 aspect-video bg-muted flex items-center justify-center relative">
+                                            <Badge variant="secondary" className="absolute top-2 left-2 text-xs font-normal">
+                                                {rttiShort[question.category]}
+                                            </Badge>
+                                            <span className="text-3xl font-bold text-muted-foreground">{question.id}</span>
+                                        </div>
+                                        <div className="flex-1 p-3">
+                                            <h4 className="font-medium text-sm mb-2">{question.title}</h4>
+                                            <div className="flex gap-4 text-xs text-muted-foreground mb-2">
+                                                <span>RIT: <span className="font-medium text-foreground">{question.rit}</span></span>
+                                                <span>P-waarde: <span className="font-medium text-foreground">{question.pValue.toFixed(2)}</span></span>
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <span className="text-xs text-muted-foreground">Gem. score</span>
+                                                    <span className="text-xs font-medium">
+                                                        {question.avgScore.toFixed(1)}/{question.maxScore}
+                                                    </span>
+                                                </div>
+                                                <Progress 
+                                                    value={scorePercentage} 
+                                                    className={`h-2 ${scorePercentage > 70 ? '[&>div]:bg-green-500' : scorePercentage > 40 ? '[&>div]:bg-primary' : '[&>div]:bg-destructive'}`}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
         );
     };
 
     const renderMainContent = () => {
-
         return (
-            <div className="flex flex-col lg:flex-row gap-6">
-                <div className="lg:w-1/2 xl:w-2/5">
-                    {renderStudentTable()}
-                </div>
-                <div className="lg:w-1/2 xl:w-3/5">
-                    {selectedStudent && <StudentAnswers student={selectedStudent} questions={questions} onBack={() => setSelectedStudent(null)} />}
-                    {!selectedStudent && (
-                        <div className="flex flex-col gap-6">
-                            {renderSummaryCards()}
-                            {renderRTTICards()}
-                            {renderQuestionGrid()}
-
-                        </div>)}
+            <div className="flex flex-col gap-6">
+                {renderStudentTable()}
+                <div id="student-answers">
+                    {selectedStudent ? (
+                        <StudentAnswers 
+                            student={selectedStudent} 
+                            questions={questions} 
+                            onBack={() => setSelectedStudent(null)} 
+                            compactView={compactView}
+                            setCompactView={setCompactView}
+                        />
+                    ) : (
+                        renderQuestionList()
+                    )}
                 </div>
             </div>
         );
     };
 
+    // Calculate percentage of failing students
+    const failingPercentage = Math.round((students.filter(s => parseFloat(s.grade) < 5.5).length / students.length) * 100);
+
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-background">
             {/* Header with CITO logo and tabs */}
             <HeaderBar currentTab={currentTab} setCurrentTab={setCurrentTab}></HeaderBar>
 
             {/* Main content */}
-            <main className="w-full px-4 py-6">
-                <div className="flex justify-between items-center mb-8">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-800">RTTI Rapportage</h1>
-                        <p className="text-gray-500 text-sm mt-1">Overzicht van toetsresultaten</p>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-600">RTTI Toets</span>
-                        <div className="bg-blue-100 rounded-md px-3 py-1">
-                            <span className="text-blue-800 font-medium">Hoofdstuk 5</span>
+            <main className="max-w-5xl mx-auto px-4 py-6">
+                <div className="flex justify-between items-center mb-6">
+                    <div className="flex items-center gap-6">
+                        <div>
+                            <h1 className="text-xl font-bold">RTTI Rapportage</h1>
+                            <p className="text-muted-foreground text-sm">Overzicht van toetsresultaten</p>
+                        </div>
+                        <div className="flex items-center gap-2 text-destructive">
+                            <Flag className="h-4 w-4 fill-destructive" />
+                            <span className="text-sm">Onvoldoendes</span>
+                            <span className="font-bold">{failingPercentage}%</span>
                         </div>
                     </div>
+
+                    <Button className="gap-2">
+                        <Download className="h-4 w-4" />
+                        Exporteer resultaten
+                    </Button>
                 </div>
 
-                {/* Summary cards */}
-                {/* {!selectedStudent && renderSummaryCards()} */}
-
-                {/* RTTI Category Cards */}
-                {/* {!selectedStudent && renderRTTICards()} */}
-
-                {/* Main content area - Student table and Question grid */}
-                <div className="mt-8">
-                    {renderMainContent()}
-                </div>
+                {/* Main content area - Student table and Question list */}
+                {renderMainContent()}
             </main>
         </div>
     );
