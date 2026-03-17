@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { HeaderBar } from './components/HeaderBar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -184,96 +185,6 @@ const generateRandomData = () => {
     return { questions, students };
 };
 
-// New: StudentAnswers component
-const StudentAnswers = ({ student, questions, onBack, compactView, setCompactView }) => (
-    <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle>Antwoorden van {student.name}</CardTitle>
-            <div className="flex items-center gap-2">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCompactView(prev => !prev)}
-                    className="gap-1"
-                >
-                    {compactView ? <LayoutGrid className="h-4 w-4" /> : <List className="h-4 w-4" />}
-                    {compactView ? 'Uitgebreid' : 'Compact'}
-                </Button>
-                <Button variant="outline" onClick={onBack} className="gap-2">
-                    <ArrowLeft className="h-4 w-4" />
-                    Terug
-                </Button>
-            </div>
-        </CardHeader>
-        <CardContent>
-            {compactView ? (
-                // Compact view: just answers and scores
-                <div className="space-y-2">
-                    {student.questionScores.map((qs, index) => {
-                        const isCorrect = qs.score === qs.maxScore;
-                        return (
-                            <div key={qs.questionId} className="flex items-center justify-between py-2 border-b last:border-b-0">
-                                <div className="flex items-center gap-3">
-                                    <span className="text-sm text-muted-foreground w-6">{index + 1}.</span>
-                                    <span className="text-sm">{qs.answer}</span>
-                                </div>
-                                <Badge 
-                                    variant="secondary" 
-                                    className={`font-bold ${isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}
-                                >
-                                    {qs.score}/{qs.maxScore}
-                                </Badge>
-                            </div>
-                        );
-                    })}
-                </div>
-            ) : (
-                // Full view: thumbnail, question, rubric, RTTI
-                <div className="space-y-3">
-                    {student.questionScores.map((qs, index) => {
-                        const question = questions.find(q => q.id === qs.questionId);
-                        const isCorrect = qs.score === qs.maxScore;
-                        return (
-                            <div key={qs.questionId} className="flex gap-4 border rounded-lg overflow-hidden">
-                                {/* Question thumbnail placeholder with RTTI badge overlay */}
-                                <div className="flex-shrink-0 w-40 aspect-video bg-muted flex items-center justify-center relative">
-                                    <Badge variant="secondary" className="absolute top-2 left-2 text-xs font-normal">
-                                        {rttiShort[question.category]}
-                                    </Badge>
-                                    <span className="text-3xl font-bold text-muted-foreground">{index + 1}</span>
-                                </div>
-                                <div className="flex-1 p-3">
-                                    <h4 className="font-medium text-sm mb-2">{question.title}</h4>
-                                    <div className="space-y-1 text-sm">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xs text-muted-foreground">Antwoord:</span>
-                                            <span className={isCorrect ? 'text-green-600' : 'text-foreground'}>
-                                                {qs.answer}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xs text-muted-foreground">Rubric:</span>
-                                            <span className="text-green-600">{question.correctAnswer}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex-shrink-0 p-3 flex items-start">
-                                    <Badge 
-                                        variant="secondary" 
-                                        className={`font-bold ${isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}
-                                    >
-                                        {qs.score}/{qs.maxScore}
-                                    </Badge>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            )}
-        </CardContent>
-    </Card>
-);
-
 const RTTIDashboard = () => {
     const [data, setData] = useState(null);
     const [selectedStudent, setSelectedStudent] = useState(null);
@@ -282,6 +193,7 @@ const RTTIDashboard = () => {
     const [questionSortKey, setQuestionSortKey] = useState('rit');
     const [questionSortDir, setQuestionSortDir] = useState<'asc' | 'desc'>('desc');
     const [compactView, setCompactView] = useState(false);
+    const [tableRef] = useAutoAnimate();
 
     useEffect(() => {
         const generatedData = generateRandomData();
@@ -346,7 +258,9 @@ const RTTIDashboard = () => {
 
     const renderStudentTable = () => {
         const SortIcon = ({ columnKey }: { columnKey: string }) => {
-            if (sortConfig.key !== columnKey) return null;
+            if (sortConfig.key !== columnKey) {
+                return <span className="inline-block w-3 h-3 ml-1" />;
+            }
             return sortConfig.direction === 'asc' ? 
                 <ChevronUp className="h-3 w-3 inline ml-1" /> : 
                 <ChevronDown className="h-3 w-3 inline ml-1" />;
@@ -356,6 +270,12 @@ const RTTIDashboard = () => {
         const classAverages = rttiCategories.reduce((acc, cat) => {
             const total = students.reduce((sum, student) => sum + getStudentRttiCorrect(student, cat), 0);
             acc[cat] = Math.round(total / students.length);
+            return acc;
+        }, {} as Record<string, number>);
+
+        // Count questions per RTTI category
+        const categoryQuestionCounts = rttiCategories.reduce((acc, cat) => {
+            acc[cat] = biologyQuestions.filter(q => q.category === cat).length;
             return acc;
         }, {} as Record<string, number>);
 
@@ -369,19 +289,19 @@ const RTTIDashboard = () => {
                         <TableHeader>
                             <TableRow className="text-xs">
                                 <TableHead 
-                                    className="cursor-pointer hover:bg-muted/50 py-2 px-2 w-16" 
+                                    className="cursor-pointer hover:bg-muted/50 py-2 px-2 w-16 whitespace-nowrap" 
                                     onClick={() => handleSort('grade')}
                                 >
                                     Cijfer <SortIcon columnKey="grade" />
                                 </TableHead>
                                 <TableHead 
-                                    className="cursor-pointer hover:bg-muted/50 py-2 px-3" 
+                                    className="cursor-pointer hover:bg-muted/50 py-2 px-3 whitespace-nowrap" 
                                     onClick={() => handleSort('firstName')}
                                 >
                                     Voornaam <SortIcon columnKey="firstName" />
                                 </TableHead>
                                 <TableHead 
-                                    className="cursor-pointer hover:bg-muted/50 py-2 px-3" 
+                                    className="cursor-pointer hover:bg-muted/50 py-2 px-3 whitespace-nowrap" 
                                     onClick={() => handleSort('lastName')}
                                 >
                                     Achternaam <SortIcon columnKey="lastName" />
@@ -393,16 +313,21 @@ const RTTIDashboard = () => {
                                         className="cursor-pointer hover:bg-muted/50 py-2 px-1 whitespace-nowrap" 
                                         onClick={() => handleSort(cat)}
                                     >
-                                        {rttiDescriptions[cat]} <SortIcon columnKey={cat} />
+                                        <div className="flex flex-col">
+                                            <span>{rttiDescriptions[cat]} <SortIcon columnKey={cat} /></span>
+                                            <span className="text-xs font-normal text-muted-foreground">{categoryQuestionCounts[cat]} vragen</span>
+                                        </div>
                                     </TableHead>
                                 ))}
                             </TableRow>
                         </TableHeader>
-                        <TableBody>
+                        <TableBody ref={tableRef}>
                             {/* Klasgemiddelde row */}
                             <TableRow className="bg-muted/30 font-medium">
                                 <TableCell className="py-2 px-2">
-                                    <span className="text-primary font-bold">{averageGrade}</span>
+                                    <Badge variant="outline" className="font-bold px-2 py-0.5">
+                                        {averageGrade}
+                                    </Badge>
                                 </TableCell>
                                 <TableCell className="py-2 px-3" colSpan={2}>Klasgemiddelde</TableCell>
                                 <TableCell />
@@ -425,20 +350,21 @@ const RTTIDashboard = () => {
                                 >
                                     <TableCell className="py-2 px-2">
                                         <Badge 
-                                            variant="secondary" 
-                                            className={`font-bold px-2 py-0.5 ${
+                                            variant="outline" 
+                                            className={`font-bold px-2 py-0.5 border-foreground ${
                                                 parseFloat(student.grade) >= 6 
-                                                    ? 'bg-green-100 text-green-700 hover:bg-green-100' 
-                                                    : parseFloat(student.grade) >= 5 
-                                                        ? 'bg-orange-100 text-orange-600 hover:bg-orange-100' 
-                                                        : 'bg-red-100 text-red-600 hover:bg-red-100'
+                                                    ? 'bg-foreground text-background hover:bg-foreground' 
+                                                    : 'bg-background text-foreground hover:bg-background'
                                             }`}
+                                            style={parseFloat(student.grade) >= 5 && parseFloat(student.grade) < 6 ? {
+                                                backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)'
+                                            } : {}}
                                         >
                                             {student.grade}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell className="py-2 px-3">{student.firstName}</TableCell>
-                                    <TableCell className="py-2 px-3">{student.lastName}</TableCell>
+                                    <TableCell className={`py-2 px-3 ${parseFloat(student.grade) >= 5.5 ? 'font-medium' : ''}`}>{student.firstName}</TableCell>
+                                    <TableCell className={`py-2 px-3 ${parseFloat(student.grade) >= 5.5 ? 'font-medium' : ''}`}>{student.lastName}</TableCell>
                                     <TableCell />
                                     {rttiCategories.map(cat => {
                                         const percent = getStudentRttiCorrect(student, cat);
@@ -458,16 +384,28 @@ const RTTIDashboard = () => {
     };
 
     const renderQuestionList = () => {
-        // Calculate average scores for each question
+        // Calculate stats for each question, including student-specific score if selected
         const questionsWithStats = questions.map(question => {
             const avgScore = students.reduce((sum, s) =>
                 sum + s.questionScores.find(qs => qs.questionId === question.id).score, 0
             ) / students.length;
             const pValue = avgScore / question.maxScore;
+            
+            // If student is selected, get their specific score
+            let studentScore = null;
+            let studentAnswer = null;
+            if (selectedStudent) {
+                const qs = selectedStudent.questionScores.find(qs => qs.questionId === question.id);
+                studentScore = qs?.score ?? 0;
+                studentAnswer = qs?.answer ?? '';
+            }
+            
             return {
                 ...question,
                 avgScore,
-                pValue
+                pValue,
+                studentScore,
+                studentAnswer
             };
         });
 
@@ -488,8 +426,14 @@ const RTTIDashboard = () => {
                     bVal = b.pValue;
                     break;
                 case 'score':
-                    aVal = a.avgScore;
-                    bVal = b.avgScore;
+                    // Use percentage score for proper ordering
+                    if (selectedStudent) {
+                        aVal = a.studentScore / a.maxScore;
+                        bVal = b.studentScore / b.maxScore;
+                    } else {
+                        aVal = a.avgScore / a.maxScore;
+                        bVal = b.avgScore / b.maxScore;
+                    }
                     break;
                 default:
                     return 0;
@@ -498,43 +442,34 @@ const RTTIDashboard = () => {
         });
 
         const handleSortClick = (key: string) => {
-            if (key === 'order') {
-                // Order always sorts ascending (1 to 10)
-                setQuestionSortKey('order');
-                setQuestionSortDir('asc');
-            } else if (questionSortKey === key) {
-                setQuestionSortDir(prev => prev === 'desc' ? 'asc' : 'desc');
-            } else {
-                setQuestionSortKey(key);
-                setQuestionSortDir('desc');
+            // Fixed directions for each sort type
+            setQuestionSortKey(key);
+            switch (key) {
+                case 'order':
+                    setQuestionSortDir('asc'); // 1 to 10
+                    break;
+                case 'rit':
+                    setQuestionSortDir('desc'); // Highest RIT first (meest onderscheidend)
+                    break;
+                case 'pvalue':
+                    setQuestionSortDir('desc'); // Highest P-value first (makkelijkste vragen)
+                    break;
+                case 'score':
+                    setQuestionSortDir('asc'); // Lowest score first (slecht gescoord)
+                    break;
             }
         };
 
-        // Descriptive labels for sort buttons based on direction
+        // Fixed labels for sort buttons
         const getSortLabel = (key: string) => {
-            const isActive = questionSortKey === key;
-            const dir = isActive ? questionSortDir : 'desc';
-            
             const labels = {
-                order: {
-                    desc: 'Volgorde in toets',
-                    asc: 'Volgorde in toets'
-                },
-                rit: {
-                    desc: 'Meest onderscheidend',
-                    asc: 'Minst onderscheidend'
-                },
-                pvalue: {
-                    desc: 'Makkelijkste vragen',
-                    asc: 'Moeilijkste vragen'
-                },
-                score: {
-                    desc: 'Best gescoord',
-                    asc: 'Slechtst gescoord'
-                }
+                order: 'Volgorde in toets',
+                rit: 'Meest onderscheidend',
+                pvalue: 'Makkelijkste vragen',
+                score: 'Slecht gescoord'
             };
             
-            return labels[key]?.[dir] || key;
+            return labels[key] || key;
         };
 
         const SortButton = ({ sortKey }: { sortKey: string }) => (
@@ -542,26 +477,38 @@ const RTTIDashboard = () => {
                 variant={questionSortKey === sortKey ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => handleSortClick(sortKey)}
-                className="gap-1"
             >
                 {getSortLabel(sortKey)}
-                {questionSortKey === sortKey && sortKey !== 'order' && (
-                    questionSortDir === 'desc' ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />
-                )}
             </Button>
         );
 
         return (
             <Card>
                 <CardHeader className="pb-2">
+                    <div className="flex items-center gap-3 mb-3">
+                        {selectedStudent && (
+                            <Button variant="outline" size="sm" onClick={() => {
+                                setSelectedStudent(null);
+                                if (questionSortKey === 'score') {
+                                    setQuestionSortKey('rit');
+                                    setQuestionSortDir('desc');
+                                }
+                            }}>
+                                <ArrowLeft className="h-4 w-4" />
+                            </Button>
+                        )}
+                        <CardTitle className="text-lg">
+                            {selectedStudent ? `Antwoorden van ${selectedStudent.name}` : 'Toets'}
+                        </CardTitle>
+                    </div>
                     <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">Vragen</CardTitle>
                         <div className="flex items-center gap-2">
                             <SortButton sortKey="order" />
                             <SortButton sortKey="rit" />
                             <SortButton sortKey="pvalue" />
-                            <SortButton sortKey="score" />
-                            <div className="w-px h-6 bg-border mx-1" />
+                            {selectedStudent && <SortButton sortKey="score" />}
+                        </div>
+                        <div className="flex items-center gap-2">
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -576,63 +523,177 @@ const RTTIDashboard = () => {
                 </CardHeader>
                 <CardContent>
                     {compactView ? (
-                        // Compact view: minimal list
+                        // Compact view: horizontal 3-column layout (thumbnail, title, data)
                         <div className="space-y-2">
                             {sortedQuestions.map((question) => {
-                                const scorePercentage = Math.round(question.pValue * 100);
+                                const isStudentView = selectedStudent !== null;
+                                const score = isStudentView ? question.studentScore : question.avgScore;
+                                const scorePercentage = Math.round((score / question.maxScore) * 100);
+                                const isCorrect = isStudentView && question.studentScore === question.maxScore;
+                                
                                 return (
-                                    <div key={question.id} className="flex items-center justify-between py-2 border-b last:border-b-0">
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-sm text-muted-foreground w-6">{question.id}.</span>
-                                            <Badge variant="outline" className="text-xs font-normal">{rttiShort[question.category]}</Badge>
-                                        </div>
-                                        <div className="flex items-center gap-4 text-xs">
-                                            <span>RIT: <span className="font-medium">{question.rit}</span></span>
-                                            <span>P: <span className="font-medium">{question.pValue.toFixed(2)}</span></span>
-                                            <Badge 
-                                                variant="secondary" 
-                                                className={`font-bold ${scorePercentage > 70 ? 'bg-green-100 text-green-700' : scorePercentage > 40 ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-600'}`}
-                                            >
-                                                {question.avgScore.toFixed(1)}/{question.maxScore}
+                                    <div key={question.id} className="flex items-center gap-3 border rounded-lg overflow-hidden p-2">
+                                        {/* Column 1: Question thumbnail with skeleton preview */}
+                                        <div className="flex-shrink-0 w-20 h-16 bg-muted rounded p-1.5 relative">
+                                            <Badge variant="secondary" className="absolute top-1 left-1 text-[9px] font-normal px-1 py-0">
+                                                {rttiShort[question.category]}
                                             </Badge>
+                                            <div className="absolute top-1 right-1 text-[10px] font-bold text-muted-foreground">{question.id}</div>
+                                            {/* Skeleton representation of question */}
+                                            <div className="mt-4 space-y-0.5">
+                                                <div className="h-1 bg-muted-foreground/20 rounded w-full" />
+                                                <div className="h-1 bg-muted-foreground/20 rounded w-4/5" />
+                                                <div className="h-1 bg-muted-foreground/15 rounded w-full" />
+                                                <div className="h-1 bg-muted-foreground/15 rounded w-3/5" />
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Column 2: Title */}
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="font-medium text-sm truncate">{question.title}</h4>
+                                            {isStudentView && (
+                                                <div className="flex items-center gap-3 text-xs mt-1">
+                                                    <span className="text-muted-foreground">Rubric: <span className="font-medium text-foreground">{question.correctAnswer}</span></span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        
+                                        {/* Column 3: Data/Stats */}
+                                        <div className="flex-shrink-0 flex items-center gap-4">
+                                            {isStudentView ? (
+                                                <>
+                                                    <span className="text-sm">
+                                                        {question.studentAnswer}
+                                                    </span>
+                                                    <Badge 
+                                                        variant="outline" 
+                                                        className={`font-bold border-foreground ${isCorrect ? 'bg-foreground text-background' : 'bg-background text-foreground'}`}
+                                                        style={score > 0 && !isCorrect ? {
+                                                            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)'
+                                                        } : {}}
+                                                    >
+                                                        {score}/{question.maxScore}
+                                                    </Badge>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {questionSortKey === 'order' ? (
+                                                        // Show all values as plain text when sorting by order
+                                                        <div className="flex gap-3 text-xs text-muted-foreground">
+                                                            <span>RIT: <span className="font-medium text-foreground">{question.rit}</span></span>
+                                                            <span>P: <span className="font-medium text-foreground">{question.pValue.toFixed(2)}</span></span>
+                                                            <span>Score: <span className="font-medium text-foreground">{question.avgScore.toFixed(1)}/{question.maxScore}</span></span>
+                                                        </div>
+                                                    ) : (
+                                                        <>
+                                                            <div className="flex gap-3 text-xs text-muted-foreground">
+                                                                {questionSortKey !== 'rit' && (
+                                                                    <span>RIT: <span className="font-medium text-foreground">{question.rit}</span></span>
+                                                                )}
+                                                                {questionSortKey !== 'pvalue' && (
+                                                                    <span>P: <span className="font-medium text-foreground">{question.pValue.toFixed(2)}</span></span>
+                                                                )}
+                                                            </div>
+                                                            {questionSortKey === 'rit' && (
+                                                                <div className="flex items-center gap-2">
+                                                                    <Progress value={question.rit * 100} className="h-2 w-20" />
+                                                                    <span className="text-xs font-medium w-8">{question.rit}</span>
+                                                                </div>
+                                                            )}
+                                                            {questionSortKey === 'pvalue' && (
+                                                                <div className="flex items-center gap-2">
+                                                                    <Progress 
+                                                                        value={question.pValue * 100} 
+                                                                        className={`h-2 w-20 ${question.pValue > 0.7 ? '[&>div]:bg-green-500' : question.pValue > 0.4 ? '[&>div]:bg-primary' : '[&>div]:bg-destructive'}`}
+                                                                    />
+                                                                    <span className="text-xs font-medium w-8">{question.pValue.toFixed(2)}</span>
+                                                                </div>
+                                                            )}
+                                                            {questionSortKey === 'score' && (
+                                                                <div className="flex items-center gap-2">
+                                                                    <Progress 
+                                                                        value={scorePercentage} 
+                                                                        className={`h-2 w-20 ${scorePercentage > 70 ? '[&>div]:bg-green-500' : scorePercentage > 40 ? '[&>div]:bg-primary' : '[&>div]:bg-destructive'}`}
+                                                                    />
+                                                                    <span className="text-xs font-medium w-10">{scorePercentage}%</span>
+                                                                </div>
+                                                            )}
+                                                        </>
+                                                    )}
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 );
                             })}
                         </div>
                     ) : (
-                        // Full view: thumbnail, question, RTTI
-                        <div className="space-y-3">
+                        // Expanded view: 2-column grid with large thumbnails
+                        <div className="grid grid-cols-2 gap-4">
                             {sortedQuestions.map((question) => {
-                                const scorePercentage = Math.round(question.pValue * 100);
+                                const isStudentView = selectedStudent !== null;
+                                const score = isStudentView ? question.studentScore : question.avgScore;
+                                const scorePercentage = Math.round((score / question.maxScore) * 100);
+                                const isCorrect = isStudentView && question.studentScore === question.maxScore;
 
                                 return (
-                                    <div key={question.id} className="flex gap-4 border rounded-lg overflow-hidden">
-                                        {/* Question thumbnail placeholder with RTTI badge overlay */}
-                                        <div className="flex-shrink-0 w-40 aspect-video bg-muted flex items-center justify-center relative">
-                                            <Badge variant="secondary" className="absolute top-2 left-2 text-xs font-normal">
+                                    <div key={question.id} className="border rounded-lg overflow-hidden">
+                                        {/* Full-width thumbnail with skeleton */}
+                                        <div className="w-full aspect-[2/1] bg-muted p-3 relative">
+                                            <Badge variant="secondary" className="absolute top-2 left-2 text-[10px] font-normal px-1.5 py-0.5">
                                                 {rttiShort[question.category]}
                                             </Badge>
-                                            <span className="text-3xl font-bold text-muted-foreground">{question.id}</span>
+                                            <div className="absolute top-2 right-2 text-sm font-bold text-muted-foreground">{question.id}</div>
+                                            {/* Skeleton representation of question */}
+                                            <div className="mt-6 space-y-1.5">
+                                                <div className="h-2 bg-muted-foreground/20 rounded w-full" />
+                                                <div className="h-2 bg-muted-foreground/20 rounded w-4/5" />
+                                                <div className="h-2 bg-muted-foreground/15 rounded w-full" />
+                                                <div className="h-2 bg-muted-foreground/15 rounded w-3/5" />
+                                                <div className="mt-3 h-1.5 bg-muted-foreground/10 rounded w-2/3" />
+                                                <div className="h-1.5 bg-muted-foreground/10 rounded w-1/2" />
+                                            </div>
                                         </div>
-                                        <div className="flex-1 p-3">
-                                            <h4 className="font-medium text-sm mb-2">{question.title}</h4>
-                                            <div className="flex gap-4 text-xs text-muted-foreground mb-2">
-                                                <span>RIT: <span className="font-medium text-foreground">{question.rit}</span></span>
-                                                <span>P-waarde: <span className="font-medium text-foreground">{question.pValue.toFixed(2)}</span></span>
-                                            </div>
-                                            <div>
-                                                <div className="flex items-center justify-between mb-1">
-                                                    <span className="text-xs text-muted-foreground">Gem. score</span>
-                                                    <span className="text-xs font-medium">
-                                                        {question.avgScore.toFixed(1)}/{question.maxScore}
-                                                    </span>
+                                        
+                                        {/* Title */}
+                                        <div className="p-3 border-b">
+                                            <h4 className="font-medium text-sm">{question.title}</h4>
+                                            {isStudentView && (
+                                                <div className="flex items-center gap-3 text-xs mt-1">
+                                                    <span className="text-muted-foreground">Rubric: <span className="font-medium text-foreground">{question.correctAnswer}</span></span>
                                                 </div>
-                                                <Progress 
-                                                    value={scorePercentage} 
-                                                    className={`h-2 ${scorePercentage > 70 ? '[&>div]:bg-green-500' : scorePercentage > 40 ? '[&>div]:bg-primary' : '[&>div]:bg-destructive'}`}
-                                                />
-                                            </div>
+                                            )}
+                                        </div>
+                                        
+                                        {/* Stats row */}
+                                        <div className="p-3 flex items-center justify-between text-xs">
+                                            {isStudentView ? (
+                                                <div className="flex items-center justify-between w-full">
+                                                    <span className="text-sm">
+                                                        {question.studentAnswer}
+                                                    </span>
+                                                    <Badge 
+                                                        variant="outline" 
+                                                        className={`font-bold border-foreground ${isCorrect ? 'bg-foreground text-background' : 'bg-background text-foreground'}`}
+                                                        style={score > 0 && !isCorrect ? {
+                                                            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)'
+                                                        } : {}}
+                                                    >
+                                                        {score}/{question.maxScore}
+                                                    </Badge>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <span className="text-muted-foreground">RIT: <span className="font-medium text-foreground">{question.rit}</span></span>
+                                                    <span className="text-muted-foreground">P: <span className="font-medium text-foreground">{question.pValue.toFixed(2)}</span></span>
+                                                    <Badge 
+                                                        variant="secondary" 
+                                                        className={`font-bold ${scorePercentage > 70 ? 'bg-green-100 text-green-700' : scorePercentage > 40 ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-600'}`}
+                                                    >
+                                                        {question.avgScore.toFixed(1)}/{question.maxScore}
+                                                    </Badge>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 );
@@ -649,17 +710,7 @@ const RTTIDashboard = () => {
             <div className="flex flex-col gap-6">
                 {renderStudentTable()}
                 <div id="student-answers">
-                    {selectedStudent ? (
-                        <StudentAnswers 
-                            student={selectedStudent} 
-                            questions={questions} 
-                            onBack={() => setSelectedStudent(null)} 
-                            compactView={compactView}
-                            setCompactView={setCompactView}
-                        />
-                    ) : (
-                        renderQuestionList()
-                    )}
+                    {renderQuestionList()}
                 </div>
             </div>
         );
@@ -677,10 +728,7 @@ const RTTIDashboard = () => {
             <main className="max-w-5xl mx-auto px-4 py-6">
                 <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-6">
-                        <div>
-                            <h1 className="text-xl font-bold">RTTI Rapportage</h1>
-                            <p className="text-muted-foreground text-sm">Overzicht van toetsresultaten</p>
-                        </div>
+                        <h1 className="text-xl font-bold">Rapportage</h1>
                         <div className="flex items-center gap-2 text-destructive">
                             <Flag className="h-4 w-4 fill-destructive" />
                             <span className="text-sm">Onvoldoendes</span>
