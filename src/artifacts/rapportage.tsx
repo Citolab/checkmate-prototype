@@ -193,6 +193,7 @@ const RTTIDashboard = () => {
     const [questionSortKey, setQuestionSortKey] = useState('rit');
     const [questionSortDir, setQuestionSortDir] = useState<'asc' | 'desc'>('desc');
     const [compactView, setCompactView] = useState(false);
+    const [expandedQuestionAnswers, setExpandedQuestionAnswers] = useState<number | null>(null);
     const [tableRef] = useAutoAnimate();
 
     useEffect(() => {
@@ -342,10 +343,18 @@ const RTTIDashboard = () => {
                                     key={student.id}
                                     className={`cursor-pointer ${selectedStudent && selectedStudent.id === student.id ? 'bg-primary/10' : ''}`}
                                     onClick={() => {
-                                        setSelectedStudent(student);
-                                        setTimeout(() => {
-                                            document.getElementById('student-answers')?.scrollIntoView({ behavior: 'smooth' });
-                                        }, 100);
+                                        if (selectedStudent && selectedStudent.id === student.id) {
+                                            setSelectedStudent(null);
+                                            if (questionSortKey === 'score') {
+                                                setQuestionSortKey('rit');
+                                                setQuestionSortDir('desc');
+                                            }
+                                        } else {
+                                            setSelectedStudent(student);
+                                            setTimeout(() => {
+                                                document.getElementById('student-answers')?.scrollIntoView({ behavior: 'smooth' });
+                                            }, 100);
+                                        }
                                     }}
                                 >
                                     <TableCell className="py-2 px-2">
@@ -688,6 +697,45 @@ const RTTIDashboard = () => {
                                                 </>
                                             )}
                                         </div>
+                                        
+                                        {/* Antwoorden button - only show in class view */}
+                                        {!isStudentView && (
+                                            <>
+                                                <button
+                                                    onClick={() => setExpandedQuestionAnswers(expandedQuestionAnswers === question.id ? null : question.id)}
+                                                    className="w-full p-2 border-t flex items-center justify-center gap-2 text-sm text-muted-foreground hover:bg-muted/50 transition-colors"
+                                                >
+                                                    Antwoorden
+                                                    <ChevronDown className={`h-4 w-4 transition-transform ${expandedQuestionAnswers === question.id ? 'rotate-180' : ''}`} />
+                                                </button>
+                                                
+                                                {/* Expanded answers section */}
+                                                {expandedQuestionAnswers === question.id && (
+                                                    <div className="border-t bg-muted/30 max-h-64 overflow-y-auto">
+                                                        <div className="p-2 space-y-1">
+                                                            {students.map(student => {
+                                                                const studentScore = student.questionScores.find(qs => qs.questionId === question.id);
+                                                                const studentIsCorrect = studentScore?.score === studentScore?.maxScore;
+                                                                return (
+                                                                    <div key={student.id} className="flex items-center justify-between py-1.5 px-2 hover:bg-background rounded text-sm">
+                                                                        <span className="text-muted-foreground">{student.name}</span>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className="text-foreground">{studentScore?.answer}</span>
+                                                                            <Badge 
+                                                                                variant="secondary" 
+                                                                                className={`font-bold text-xs ${studentIsCorrect ? 'bg-green-100 text-green-700' : studentScore?.score > 0 ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-600'}`}
+                                                                            >
+                                                                                {studentScore?.score}/{studentScore?.maxScore}
+                                                                            </Badge>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
                                     </div>
                                 );
                             })}
