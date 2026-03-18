@@ -350,15 +350,14 @@ const RTTIDashboard = () => {
                                 >
                                     <TableCell className="py-2 px-2">
                                         <Badge 
-                                            variant="outline" 
-                                            className={`font-bold px-2 py-0.5 border-foreground ${
+                                            variant="secondary" 
+                                            className={`font-bold px-2 py-0.5 ${
                                                 parseFloat(student.grade) >= 6 
-                                                    ? 'bg-foreground text-background hover:bg-foreground' 
-                                                    : 'bg-background text-foreground hover:bg-background'
+                                                    ? 'bg-green-100 text-green-700 hover:bg-green-100' 
+                                                    : parseFloat(student.grade) >= 5 
+                                                        ? 'bg-orange-100 text-orange-600 hover:bg-orange-100' 
+                                                        : 'bg-red-100 text-red-600 hover:bg-red-100'
                                             }`}
-                                            style={parseFloat(student.grade) >= 5 && parseFloat(student.grade) < 6 ? {
-                                                backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)'
-                                            } : {}}
                                         >
                                             {student.grade}
                                         </Badge>
@@ -566,11 +565,8 @@ const RTTIDashboard = () => {
                                                         {question.studentAnswer}
                                                     </span>
                                                     <Badge 
-                                                        variant="outline" 
-                                                        className={`font-bold border-foreground ${isCorrect ? 'bg-foreground text-background' : 'bg-background text-foreground'}`}
-                                                        style={score > 0 && !isCorrect ? {
-                                                            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)'
-                                                        } : {}}
+                                                        variant="secondary" 
+                                                        className={`font-bold ${isCorrect ? 'bg-green-100 text-green-700' : score > 0 ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-600'}`}
                                                     >
                                                         {score}/{question.maxScore}
                                                     </Badge>
@@ -673,11 +669,8 @@ const RTTIDashboard = () => {
                                                         {question.studentAnswer}
                                                     </span>
                                                     <Badge 
-                                                        variant="outline" 
-                                                        className={`font-bold border-foreground ${isCorrect ? 'bg-foreground text-background' : 'bg-background text-foreground'}`}
-                                                        style={score > 0 && !isCorrect ? {
-                                                            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)'
-                                                        } : {}}
+                                                        variant="secondary" 
+                                                        className={`font-bold ${isCorrect ? 'bg-green-100 text-green-700' : score > 0 ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-600'}`}
                                                     >
                                                         {score}/{question.maxScore}
                                                     </Badge>
